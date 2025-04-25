@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "Ksx99j+OpWjAGLva4NHkNlIAFHOkF3O/Be7m69Z4WUc=",
+  "Source": "Coachify.API",
+  "BasePath": "_content/Coachify.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

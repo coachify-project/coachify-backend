@@ -1,0 +1,15 @@
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\bin\Debug\net9.0\Coachify.BLL.deps.json
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\bin\Debug\net9.0\Coachify.BLL.dll
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\bin\Debug\net9.0\Coachify.BLL.pdb
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\bin\Debug\net9.0\Coachify.DAL.dll
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\bin\Debug\net9.0\Coachify.DAL.pdb
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\obj\Debug\net9.0\Coachify.BLL.csproj.AssemblyReference.cache
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\obj\Debug\net9.0\Coachify.BLL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\obj\Debug\net9.0\Coachify.BLL.AssemblyInfoInputs.cache
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\obj\Debug\net9.0\Coachify.BLL.AssemblyInfo.cs
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\obj\Debug\net9.0\Coachify.BLL.csproj.CoreCompileInputs.cache
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\obj\Debug\net9.0\Coachify.7EC7B92B.Up2Date
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\obj\Debug\net9.0\Coachify.BLL.dll
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\obj\Debug\net9.0\refint\Coachify.BLL.dll
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\obj\Debug\net9.0\Coachify.BLL.pdb
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.BLL\obj\Debug\net9.0\ref\Coachify.BLL.dll

@@ -1,0 +1,12 @@
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.DAL\bin\Debug\net9.0\Coachify.DAL.deps.json
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.DAL\bin\Debug\net9.0\Coachify.DAL.dll
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.DAL\bin\Debug\net9.0\Coachify.DAL.pdb
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.DAL\obj\Debug\net9.0\Coachify.DAL.csproj.AssemblyReference.cache
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.DAL\obj\Debug\net9.0\Coachify.DAL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.DAL\obj\Debug\net9.0\Coachify.DAL.AssemblyInfoInputs.cache
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.DAL\obj\Debug\net9.0\Coachify.DAL.AssemblyInfo.cs
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.DAL\obj\Debug\net9.0\Coachify.DAL.csproj.CoreCompileInputs.cache
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.DAL\obj\Debug\net9.0\Coachify.DAL.dll
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.DAL\obj\Debug\net9.0\refint\Coachify.DAL.dll
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.DAL\obj\Debug\net9.0\Coachify.DAL.pdb
+C:\Users\Hp\Programming\CoachifyProject\CoachifyPlatform\Coachify.DAL\obj\Debug\net9.0\ref\Coachify.DAL.dll
