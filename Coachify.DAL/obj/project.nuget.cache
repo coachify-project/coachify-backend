@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "BW07K+hYWKA=",
+  "dgSpecHash": "2+yCZi7i6BM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Hp\\Programming\\CoachifyProject\\CoachifyPlatform\\Coachify.DAL\\Coachify.DAL.csproj",
+  "projectFilePath": "C:\\Users\\Hp\\Programming\\CoachifyProject\\coachify-backend\\Coachify.DAL\\Coachify.DAL.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Hp\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Hp\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
