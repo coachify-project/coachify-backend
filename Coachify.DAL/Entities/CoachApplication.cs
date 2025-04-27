@@ -8,9 +8,10 @@ public class CoachApplication
     public int ApplicationId { get; set; }
 
     public int UserId { get; set; }
-    public User Applicant { get; set; }
+    public User Applicant { get; set; } = null!;
 
     public DateTime SubmittedAt { get; set; }
-    public ApplicationStatus Status { get; set; } // Pending, Approved, Rejected
+    public int StatusId { get; set; }
+    public UserCoachApplicationStatus Status { get; set; } = null!;  // Pending, Approved, Rejected
 
 }

@@ -6,27 +6,19 @@ public class User
 {
     [Key]
     public int UserId { get; set; }
-    [Required]
-    public string FirstName { get; set; }
-    [Required]
-    public string LastName { get; set; }
-    [Required]
-    public string Email { get; set; }
-    [Required]
-    public string PasswordHash { get; set; }
+
+    [Required, MaxLength(50)] public string FirstName { get; set; } = null!;
+    [Required, MaxLength(50)] public string LastName { get; set; } = null!;
+    [Required, MaxLength(50)] public string Email { get; set; } = null!;
+    [Required, MaxLength(255)] public string PasswordHash { get; set; } = null!;
     [Required]
     public string PasswordSalt { get; set; }
 
     public int RoleId { get; set; }
-    public Role Role { get; set; }
+    public Role Role { get; set; } = null!;
 
-    // Coach applications and profile
-    public ICollection<CoachApplication> CoachApplications { get; set; }
-    public CoachProfile CoachProfile { get; set; }
-
-    // Enrollments, reviews, feedbacks, certificates
-    public ICollection<Enrollment> Enrollments { get; set; }
-    public ICollection<Feedback> Feedbacks { get; set; }
-    public ICollection<Certificate> Certificates { get; set; }
-    public ICollection<TestSubmission> TestSubmissions { get; set; }
+    public Coach? CoachProfile { get; set; }
+    public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+    public ICollection<Feedback>     Feedbacks    { get; set; } = new List<Feedback>();
+    public ICollection<TestSubmission> TestSubmissions { get; set; } = new List<TestSubmission>();
 }

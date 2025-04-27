@@ -6,8 +6,8 @@ public class Role
 {
     [Key]
     public int RoleId { get; set; }
-    [Required]
-    public string RoleName { get; set; } // Guest, Client, CoachApplicant, Coach, Admin
 
-    public ICollection<User> Users { get; set; }
+    [Required, MaxLength(25)] public string RoleName { get; set; } = null!; // Guest, Client, CoachApplicant, Coach, Admin
+
+    public ICollection<User> Users { get; set; } = new List<User>();
 }

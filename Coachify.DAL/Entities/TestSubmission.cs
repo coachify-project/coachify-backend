@@ -8,12 +8,15 @@ public class TestSubmission
     public int SubmissionId { get; set; }
 
     public int TestId { get; set; }
-    public Test Test { get; set; }
+    public Test Test { get; set; } = null!;
 
     public int UserId { get; set; }
-    public User Student { get; set; }
+    public User Client { get; set; } = null!;
 
+    [Required]
     public DateTime SubmittedAt { get; set; }
-    public double Score { get; set; }
-    public bool Passed { get; set; }
+    public int Score { get; set; }
+    public bool IsPassed { get; set; }
+
+    public ICollection<TestSubmissionAnswer> Answers { get; set; } = new List<TestSubmissionAnswer>();
 }

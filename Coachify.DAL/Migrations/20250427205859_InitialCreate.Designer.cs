@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Coachify.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250426193257_InitialCreate")]
+    [Migration("20250427205859_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -34,6 +34,7 @@ namespace Coachify.DAL.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.HasKey("OptionId");
@@ -43,29 +44,19 @@ namespace Coachify.DAL.Migrations
                     b.ToTable("AnswerOptions");
                 });
 
-            modelBuilder.Entity("Coachify.DAL.Entities.ApplicationStatus", b =>
-                {
-                    b.Property<int>("StatusId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("StatusId");
-
-                    b.ToTable("ApplicationStatuses");
-                });
-
             modelBuilder.Entity("Coachify.DAL.Entities.Category", b =>
                 {
                     b.Property<int>("CategoryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.HasKey("CategoryId");
@@ -79,26 +70,52 @@ namespace Coachify.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CourseId")
+                    b.Property<int>("CertificateNum")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("CertificateUrl")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("CourseTitle")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("IssuedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("UserId")
+                    b.Property<int>("EnrollmentId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("IssueDate")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("CertificateId");
 
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("UserId");
+                    b.HasIndex("EnrollmentId")
+                        .IsUnique();
 
                     b.ToTable("Certificates");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.Coach", b =>
+                {
+                    b.Property<int>("CoachId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Specialization")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Verified")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("CoachId");
+
+                    b.ToTable("Coaches");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.CoachApplication", b =>
@@ -125,24 +142,6 @@ namespace Coachify.DAL.Migrations
                     b.ToTable("CoachApplications");
                 });
 
-            modelBuilder.Entity("Coachify.DAL.Entities.CoachProfile", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("About")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Specialization")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("CoachProfiles");
-                });
-
             modelBuilder.Entity("Coachify.DAL.Entities.Course", b =>
                 {
                     b.Property<int>("CourseId")
@@ -155,14 +154,17 @@ namespace Coachify.DAL.Migrations
                     b.Property<int>("CoachId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Description")
-                        .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("MaxStudents")
+                    b.Property<int?>("MaxClients")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double?>("Price")
+                        .HasColumnType("REAL");
+
+                    b.Property<int?>("Rating")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("StatusId")
@@ -170,6 +172,7 @@ namespace Coachify.DAL.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.HasKey("CourseId");
@@ -191,6 +194,7 @@ namespace Coachify.DAL.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.HasKey("StatusId");
@@ -204,14 +208,17 @@ namespace Coachify.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("Completed")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("CourseId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("EnrolledAt")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsEnrolled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ProgressPercentage")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
@@ -231,11 +238,13 @@ namespace Coachify.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("ClientId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("CourseId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("Rating")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("StatusId")
@@ -244,16 +253,17 @@ namespace Coachify.DAL.Migrations
                     b.Property<DateTime>("SubmittedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("FeedbackId");
+
+                    b.HasIndex("ClientId");
 
                     b.HasIndex("CourseId");
 
                     b.HasIndex("StatusId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Feedbacks");
                 });
@@ -266,6 +276,7 @@ namespace Coachify.DAL.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.HasKey("StatusId");
@@ -280,45 +291,51 @@ namespace Coachify.DAL.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
-                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LessonMaterials")
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ModuleId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("StatusId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VideoUrl")
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.HasKey("LessonId");
 
                     b.HasIndex("ModuleId");
 
+                    b.HasIndex("StatusId");
+
                     b.ToTable("Lessons");
                 });
 
-            modelBuilder.Entity("Coachify.DAL.Entities.LessonMaterial", b =>
+            modelBuilder.Entity("Coachify.DAL.Entities.LessonStatus", b =>
                 {
-                    b.Property<int>("MaterialId")
+                    b.Property<int>("StatusId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("LessonId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Title")
+                    b.Property<string>("StatusName")
                         .IsRequired()
+                        .HasMaxLength(25)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.HasKey("StatusId");
 
-                    b.HasKey("MaterialId");
-
-                    b.HasIndex("LessonId");
-
-                    b.ToTable("LessonMaterials");
+                    b.ToTable("LessonStatuses");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Module", b =>
@@ -330,15 +347,88 @@ namespace Coachify.DAL.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("StatusId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("TestId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.HasKey("ModuleId");
 
                     b.HasIndex("CourseId");
 
+                    b.HasIndex("StatusId");
+
                     b.ToTable("Modules");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.ModuleStatus", b =>
+                {
+                    b.Property<int>("StatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("StatusName")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("StatusId");
+
+                    b.ToTable("ModuleStatuses");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.Payment", b =>
+                {
+                    b.Property<int>("PaymentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("EnrollId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("PaidAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TransactionId")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PaymentId");
+
+                    b.HasIndex("EnrollId")
+                        .IsUnique();
+
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.PaymentStatus", b =>
+                {
+                    b.Property<int>("StatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("StatusId");
+
+                    b.ToTable("PaymentStatuses");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Question", b =>
@@ -352,6 +442,7 @@ namespace Coachify.DAL.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.HasKey("QuestionId");
@@ -369,6 +460,7 @@ namespace Coachify.DAL.Migrations
 
                     b.Property<string>("RoleName")
                         .IsRequired()
+                        .HasMaxLength(25)
                         .HasColumnType("TEXT");
 
                     b.HasKey("RoleId");
@@ -382,14 +474,30 @@ namespace Coachify.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("LessonId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MaxScore")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("ModuleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PassScore")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.HasKey("TestId");
+
+                    b.HasIndex("LessonId");
 
                     b.HasIndex("ModuleId")
                         .IsUnique();
@@ -403,11 +511,14 @@ namespace Coachify.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("Passed")
+                    b.Property<int?>("EnrollmentId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<double>("Score")
-                        .HasColumnType("REAL");
+                    b.Property<bool>("IsPassed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("SubmittedAt")
                         .HasColumnType("TEXT");
@@ -420,11 +531,39 @@ namespace Coachify.DAL.Migrations
 
                     b.HasKey("SubmissionId");
 
+                    b.HasIndex("EnrollmentId");
+
                     b.HasIndex("TestId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("TestSubmissions");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.TestSubmissionAnswer", b =>
+                {
+                    b.Property<int>("SubmissionAnswerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OptionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("SubmissionAnswerId");
+
+                    b.HasIndex("OptionId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("SubmissionId");
+
+                    b.ToTable("TestSubmissionAnswers");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.User", b =>
@@ -435,18 +574,22 @@ namespace Coachify.DAL.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LastName")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PasswordSalt")
@@ -466,6 +609,22 @@ namespace Coachify.DAL.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Coachify.DAL.Entities.UserCoachApplicationStatus", b =>
+                {
+                    b.Property<int>("StatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("StatusId");
+
+                    b.ToTable("UserCoachApplicationStatuses");
+                });
+
             modelBuilder.Entity("Coachify.DAL.Entities.AnswerOption", b =>
                 {
                     b.HasOne("Coachify.DAL.Entities.Question", "Question")
@@ -479,33 +638,36 @@ namespace Coachify.DAL.Migrations
 
             modelBuilder.Entity("Coachify.DAL.Entities.Certificate", b =>
                 {
-                    b.HasOne("Coachify.DAL.Entities.Course", "Course")
-                        .WithMany("Certificates")
-                        .HasForeignKey("CourseId")
+                    b.HasOne("Coachify.DAL.Entities.Enrollment", "Enrollment")
+                        .WithOne("Certificate")
+                        .HasForeignKey("Coachify.DAL.Entities.Certificate", "EnrollmentId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.Navigation("Enrollment");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.Coach", b =>
+                {
+                    b.HasOne("Coachify.DAL.Entities.User", "User")
+                        .WithOne("CoachProfile")
+                        .HasForeignKey("Coachify.DAL.Entities.Coach", "CoachId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Coachify.DAL.Entities.User", "Student")
-                        .WithMany("Certificates")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Student");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.CoachApplication", b =>
                 {
-                    b.HasOne("Coachify.DAL.Entities.ApplicationStatus", "Status")
+                    b.HasOne("Coachify.DAL.Entities.UserCoachApplicationStatus", "Status")
                         .WithMany("Applications")
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Coachify.DAL.Entities.User", "Applicant")
-                        .WithMany("CoachApplications")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -513,17 +675,6 @@ namespace Coachify.DAL.Migrations
                     b.Navigation("Applicant");
 
                     b.Navigation("Status");
-                });
-
-            modelBuilder.Entity("Coachify.DAL.Entities.CoachProfile", b =>
-                {
-                    b.HasOne("Coachify.DAL.Entities.User", "Applicant")
-                        .WithOne("CoachProfile")
-                        .HasForeignKey("Coachify.DAL.Entities.CoachProfile", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Applicant");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Course", b =>
@@ -534,10 +685,10 @@ namespace Coachify.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Coachify.DAL.Entities.User", "Coach")
-                        .WithMany()
+                    b.HasOne("Coachify.DAL.Entities.Coach", "Coach")
+                        .WithMany("Courses")
                         .HasForeignKey("CoachId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Coachify.DAL.Entities.CourseStatus", "Status")
@@ -561,19 +712,25 @@ namespace Coachify.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Coachify.DAL.Entities.User", "Student")
+                    b.HasOne("Coachify.DAL.Entities.User", "User")
                         .WithMany("Enrollments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Course");
 
-                    b.Navigation("Student");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Feedback", b =>
                 {
+                    b.HasOne("Coachify.DAL.Entities.User", "Client")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Coachify.DAL.Entities.Course", "Course")
                         .WithMany("Feedbacks")
                         .HasForeignKey("CourseId")
@@ -584,12 +741,6 @@ namespace Coachify.DAL.Migrations
                         .WithMany("Feedbacks")
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Coachify.DAL.Entities.User", "Client")
-                        .WithMany("Feedbacks")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Client");
@@ -607,18 +758,15 @@ namespace Coachify.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Module");
-                });
-
-            modelBuilder.Entity("Coachify.DAL.Entities.LessonMaterial", b =>
-                {
-                    b.HasOne("Coachify.DAL.Entities.Lesson", "Lesson")
-                        .WithMany("Materials")
-                        .HasForeignKey("LessonId")
+                    b.HasOne("Coachify.DAL.Entities.LessonStatus", "Status")
+                        .WithMany("Lessons")
+                        .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Lesson");
+                    b.Navigation("Module");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Module", b =>
@@ -629,7 +777,34 @@ namespace Coachify.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Coachify.DAL.Entities.ModuleStatus", "Status")
+                        .WithMany("Modules")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Course");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.Payment", b =>
+                {
+                    b.HasOne("Coachify.DAL.Entities.Enrollment", "Enrollment")
+                        .WithOne("Payment")
+                        .HasForeignKey("Coachify.DAL.Entities.Payment", "EnrollId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.HasOne("Coachify.DAL.Entities.PaymentStatus", "Status")
+                        .WithMany("Payments")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Enrollment");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Question", b =>
@@ -645,6 +820,10 @@ namespace Coachify.DAL.Migrations
 
             modelBuilder.Entity("Coachify.DAL.Entities.Test", b =>
                 {
+                    b.HasOne("Coachify.DAL.Entities.Lesson", null)
+                        .WithMany("Tests")
+                        .HasForeignKey("LessonId");
+
                     b.HasOne("Coachify.DAL.Entities.Module", "Module")
                         .WithOne("Test")
                         .HasForeignKey("Coachify.DAL.Entities.Test", "ModuleId")
@@ -656,21 +835,52 @@ namespace Coachify.DAL.Migrations
 
             modelBuilder.Entity("Coachify.DAL.Entities.TestSubmission", b =>
                 {
+                    b.HasOne("Coachify.DAL.Entities.Enrollment", null)
+                        .WithMany("TestSubmissions")
+                        .HasForeignKey("EnrollmentId");
+
                     b.HasOne("Coachify.DAL.Entities.Test", "Test")
-                        .WithMany()
+                        .WithMany("Submissions")
                         .HasForeignKey("TestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Coachify.DAL.Entities.User", "Student")
+                    b.HasOne("Coachify.DAL.Entities.User", "Client")
                         .WithMany("TestSubmissions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Student");
+                    b.Navigation("Client");
 
                     b.Navigation("Test");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.TestSubmissionAnswer", b =>
+                {
+                    b.HasOne("Coachify.DAL.Entities.AnswerOption", "Option")
+                        .WithMany("TestSubmissionAnswers")
+                        .HasForeignKey("OptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Coachify.DAL.Entities.Question", "Question")
+                        .WithMany("TestSubmissionAnswers")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Coachify.DAL.Entities.TestSubmission", "Submission")
+                        .WithMany("Answers")
+                        .HasForeignKey("SubmissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Option");
+
+                    b.Navigation("Question");
+
+                    b.Navigation("Submission");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.User", b =>
@@ -684,9 +894,9 @@ namespace Coachify.DAL.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Coachify.DAL.Entities.ApplicationStatus", b =>
+            modelBuilder.Entity("Coachify.DAL.Entities.AnswerOption", b =>
                 {
-                    b.Navigation("Applications");
+                    b.Navigation("TestSubmissionAnswers");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Category", b =>
@@ -694,10 +904,13 @@ namespace Coachify.DAL.Migrations
                     b.Navigation("Courses");
                 });
 
+            modelBuilder.Entity("Coachify.DAL.Entities.Coach", b =>
+                {
+                    b.Navigation("Courses");
+                });
+
             modelBuilder.Entity("Coachify.DAL.Entities.Course", b =>
                 {
-                    b.Navigation("Certificates");
-
                     b.Navigation("Enrollments");
 
                     b.Navigation("Feedbacks");
@@ -710,6 +923,15 @@ namespace Coachify.DAL.Migrations
                     b.Navigation("Courses");
                 });
 
+            modelBuilder.Entity("Coachify.DAL.Entities.Enrollment", b =>
+                {
+                    b.Navigation("Certificate");
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("TestSubmissions");
+                });
+
             modelBuilder.Entity("Coachify.DAL.Entities.FeedbackStatus", b =>
                 {
                     b.Navigation("Feedbacks");
@@ -717,20 +939,36 @@ namespace Coachify.DAL.Migrations
 
             modelBuilder.Entity("Coachify.DAL.Entities.Lesson", b =>
                 {
-                    b.Navigation("Materials");
+                    b.Navigation("Tests");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.LessonStatus", b =>
+                {
+                    b.Navigation("Lessons");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Module", b =>
                 {
                     b.Navigation("Lessons");
 
-                    b.Navigation("Test")
-                        .IsRequired();
+                    b.Navigation("Test");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.ModuleStatus", b =>
+                {
+                    b.Navigation("Modules");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.PaymentStatus", b =>
+                {
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Question", b =>
                 {
                     b.Navigation("Options");
+
+                    b.Navigation("TestSubmissionAnswers");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Role", b =>
@@ -741,22 +979,29 @@ namespace Coachify.DAL.Migrations
             modelBuilder.Entity("Coachify.DAL.Entities.Test", b =>
                 {
                     b.Navigation("Questions");
+
+                    b.Navigation("Submissions");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.TestSubmission", b =>
+                {
+                    b.Navigation("Answers");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.User", b =>
                 {
-                    b.Navigation("Certificates");
-
-                    b.Navigation("CoachApplications");
-
-                    b.Navigation("CoachProfile")
-                        .IsRequired();
+                    b.Navigation("CoachProfile");
 
                     b.Navigation("Enrollments");
 
                     b.Navigation("Feedbacks");
 
                     b.Navigation("TestSubmissions");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.UserCoachApplicationStatus", b =>
+                {
+                    b.Navigation("Applications");
                 });
 #pragma warning restore 612, 618
         }

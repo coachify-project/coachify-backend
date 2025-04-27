@@ -8,10 +8,10 @@ public class AnswerOption
     public int OptionId { get; set; }
 
     public int QuestionId { get; set; }
-    public Question Question { get; set; }
+    public Question Question { get; set; } = null!;
 
-    [Required]
-    public string Text { get; set; }
+    [Required, MaxLength(255)] public string Text { get; set; } = null!;
 
     public bool IsCorrect { get; set; }
+    public IEnumerable<TestSubmissionAnswer>? TestSubmissionAnswers { get; set; }
 }

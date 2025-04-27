@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Coachify.DAL.Entities;
 
@@ -6,14 +7,22 @@ public class Feedback
 {
     [Key]
     public int FeedbackId { get; set; }
-
-    public int UserId { get; set; }
-    public User Client { get; set; }
-
+    
+    [ForeignKey(nameof(Course))]
     public int CourseId { get; set; }
-    public Course Course { get; set; }
+    public Course Course { get; set; } = null!;
+    
+    [ForeignKey(nameof(Client))]
+    public int ClientId { get; set; }
+    public User Client { get; set; } = null!;
 
-    public string Comment { get; set; }
+    [Required]
+    public string Text { get; set; } = null!;
+    
     public DateTime SubmittedAt { get; set; }
-    public FeedbackStatus Status { get; set; } // Pending, Approved, Rejected
+    
+    public int? Rating { get; set; } 
+    
+    public int StatusId { get; set; }
+    public FeedbackStatus Status { get; set; } = null!; // Pending, Approved, Rejected
 }
