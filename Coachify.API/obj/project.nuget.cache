@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "I2L11vhP3js=",
+  "dgSpecHash": "0nnQxtwe0ec=",
   "success": true,
   "projectFilePath": "C:\\Users\\Hp\\Programming\\CoachifyProject\\coachify-backend\\Coachify.API\\Coachify.API.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Hp\\.nuget\\packages\\automapper\\14.0.0\\automapper.14.0.0.nupkg.sha512",
     "C:\\Users\\Hp\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Hp\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
     "C:\\Users\\Hp\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
