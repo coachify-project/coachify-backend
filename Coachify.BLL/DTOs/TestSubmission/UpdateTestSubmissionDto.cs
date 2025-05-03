@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.TestSubmission;
+﻿namespace Coachify.BLL.DTOs.TestSubmission;
 
 public class UpdateTestSubmissionDto
 {

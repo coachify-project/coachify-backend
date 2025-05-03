@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.User;
+﻿namespace Coachify.BLL.DTOs.User;
 
 public class UserDto
 {

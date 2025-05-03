@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.Lesson;
+﻿namespace Coachify.BLL.DTOs.Lesson;
 
 public class CreateLessonDto
 {

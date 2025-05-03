@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.PaymentStatus;
+﻿namespace Coachify.BLL.DTOs.PaymentStatus;
 
 public class PaymentStatusDto
 {

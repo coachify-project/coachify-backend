@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.Categoty;
+﻿namespace Coachify.BLL.DTOs.Categoty;
 
 public class UpdateCategoryDto
 {

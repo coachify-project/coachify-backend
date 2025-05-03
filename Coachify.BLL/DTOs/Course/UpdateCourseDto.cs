@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.Course;
+﻿namespace Coachify.BLL.DTOs.Course;
 
 public class UpdateCourseDto
 {

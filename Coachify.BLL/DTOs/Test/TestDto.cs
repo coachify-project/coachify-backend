@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.Test;
+﻿namespace Coachify.BLL.DTOs.Test;
 
 public class TestDto
 {

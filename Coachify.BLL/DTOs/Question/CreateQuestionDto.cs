@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.Question;
+﻿namespace Coachify.BLL.DTOs.Question;
 
 public class CreateQuestionDto
 {

@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.Certificate;
+﻿namespace Coachify.BLL.DTOs.Certificate;
 
 public class CreateCertificateDto
 {

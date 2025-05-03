@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.AnswerOption;
+﻿namespace Coachify.BLL.DTOs.AnswerOption;
 
 public class UpdateAnswerOptionDto
 {

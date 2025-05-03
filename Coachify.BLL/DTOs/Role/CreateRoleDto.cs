@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.Role;
+﻿namespace Coachify.BLL.DTOs.Role;
 
 public class CreateRoleDto
 {

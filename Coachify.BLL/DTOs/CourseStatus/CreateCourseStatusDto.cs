@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.CourseStatus;
+﻿namespace Coachify.BLL.DTOs.CourseStatus;
 
 public class CreateCourseStatusDto
 {

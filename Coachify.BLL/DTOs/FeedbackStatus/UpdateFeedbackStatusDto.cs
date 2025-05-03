@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.FeedbackStatus;
+﻿namespace Coachify.BLL.DTOs.FeedbackStatus;
 
 public class UpdateFeedbackStatusDto
 {

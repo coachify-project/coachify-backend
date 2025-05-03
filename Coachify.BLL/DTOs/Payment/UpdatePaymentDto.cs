@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.Payment;
+﻿namespace Coachify.BLL.DTOs.Payment;
 
 public class UpdatePaymentDto
 {

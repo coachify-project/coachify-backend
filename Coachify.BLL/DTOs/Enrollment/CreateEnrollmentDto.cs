@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.Enrollment;
+﻿namespace Coachify.BLL.DTOs.Enrollment;
 
 public class CreateEnrollmentDto
 {

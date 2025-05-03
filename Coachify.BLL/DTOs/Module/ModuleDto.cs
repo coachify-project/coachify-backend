@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.Module;
+﻿namespace Coachify.BLL.DTOs.Module;
 
 public class ModuleDto
 {

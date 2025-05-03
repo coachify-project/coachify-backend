@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.ModuleStatus;
+﻿namespace Coachify.BLL.DTOs.ModuleStatus;
 
 public class UpdateModuleStatusDto
 {

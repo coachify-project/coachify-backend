@@ -1,6 +1,7 @@
-﻿namespace Coachify.API.DTOs.UserCoachApplicationStatus;
+﻿namespace Coachify.BLL.DTOs.UserCoachApplicationStatus;
 
 public class UpdateUserCoachApplicationStatusDto
 {
-    public string Name { get; set; }
+    public string Status { get; set; } = string.Empty;
+    
 }

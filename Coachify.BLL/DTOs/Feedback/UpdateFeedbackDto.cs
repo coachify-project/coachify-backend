@@ -1,4 +1,4 @@
-﻿namespace Coachify.API.DTOs.Feedback;
+﻿namespace Coachify.BLL.DTOs.Feedback;
 
 public class UpdateFeedbackDto
 {
