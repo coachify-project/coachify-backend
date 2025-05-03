@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Coachify.DAL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fab57ce49fc5930261a40b4c6968626ef5ff3ad9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4e74dcc34f9d36fc7e9377f5aac9159adf2f1e70")]
 [assembly: System.Reflection.AssemblyProductAttribute("Coachify.DAL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Coachify.DAL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

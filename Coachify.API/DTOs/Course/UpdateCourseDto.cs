@@ -1,0 +1,10 @@
+﻿namespace Coachify.API.DTOs.Course;
+
+public class UpdateCourseDto
+{
+    public int Id { get; set; }
+    public string Title { get; set; }
+    public int CoachId { get; set; }
+    public int CategoryId { get; set; }
+    public int StatusId { get; set; }
+}
