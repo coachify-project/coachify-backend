@@ -1,6 +1,6 @@
 ﻿namespace Coachify.BLL.DTOs.Certificate;
 
-public class CetificateDto
+public class CertificateDto
 {
     public int Id { get; set; }
     public string EnrollmentId { get; set; }
