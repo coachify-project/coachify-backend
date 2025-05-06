@@ -2,7 +2,7 @@
 
 namespace Coachify.BLL.Interfaces;
 
-public interface IModulStatusService
+public interface IModuleStatusService
 {
     Task<IEnumerable<ModuleStatusDto>> GetAllAsync();
     Task<ModuleStatusDto?> GetByIdAsync(int id);
