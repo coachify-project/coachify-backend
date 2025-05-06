@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using Coachify.BLL.DTOs.Question;
+using Coachify.BLL.Interfaces;
 using Coachify.DAL;
 using Coachify.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Coachify.BLL.Services;
 
-public class QuestionService
+public class QuestionService : IQuestionService
 {
     private readonly ApplicationDbContext _db;
     private readonly IMapper _mapper;

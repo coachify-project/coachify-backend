@@ -29,8 +29,15 @@ namespace Coachify.DAL
         public DbSet<User> Users { get; set; }
         public DbSet<UserCoachApplicationStatus> UserCoachApplicationStatuses { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseSqlite("Data Source=coachify.db");
+        // Конструктор с DbContextOptions для корректной работы с DI
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
+        {
+        }
+
+        // Убираем конфигурацию соединения из OnConfiguring, так как это теперь выполняется через DI
+        // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //     => optionsBuilder.UseSqlite("Data Source=coachify.db");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -148,6 +155,5 @@ namespace Coachify.DAL
                 .WithOne(f => f.Status)
                 .HasForeignKey(f => f.StatusId);
         }
-
     }
 }
