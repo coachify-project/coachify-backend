@@ -1,7 +1,11 @@
-﻿namespace Coachify.BLL.DTOs.Role;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Coachify.BLL.DTOs.Role;
 
 public class RoleDto
 {
+    [Required]
     public int Id { get; set; }
-    public string Name { get; set; }
+    [Required]
+    public string RoleName { get; set; }
 }

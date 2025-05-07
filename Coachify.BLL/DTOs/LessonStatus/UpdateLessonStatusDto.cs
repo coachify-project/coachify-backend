@@ -2,5 +2,5 @@
 
 public class UpdateLessonStatusDto
 {
-    public string Name { get; set; }
+    public string StatusName { get; set; }
 }

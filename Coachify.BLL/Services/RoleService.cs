@@ -18,8 +18,16 @@ public class RoleService : IRoleService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<RoleDto>> GetAllAsync() =>
-        _mapper.Map<IEnumerable<RoleDto>>(await _db.Roles.ToListAsync());
+    public async Task<IEnumerable<RoleDto>> GetAllAsync()
+    {
+        var roles = await _db.Roles.ToListAsync();
+        return roles.Select(r => new RoleDto
+        {
+            Id = r.RoleId,
+            RoleName = r.RoleName
+        });
+    }
+
 
     public async Task<RoleDto?> GetByIdAsync(int id)
     {

@@ -36,8 +36,8 @@ namespace Coachify.DAL
         }
 
         // Убираем конфигурацию соединения из OnConfiguring, так как это теперь выполняется через DI
-        // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //     => optionsBuilder.UseSqlite("Data Source=coachify.db");
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+             => optionsBuilder.UseSqlite("Data Source=coachify.db");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

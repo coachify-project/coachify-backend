@@ -1,6 +1,9 @@
-﻿namespace Coachify.BLL.DTOs.LessonStatus;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Coachify.BLL.DTOs.LessonStatus;
 
 public class CreateLessonStatusDto
 {
-    public string Name { get; set; }
+    [Required]
+    public string StatusName { get; set; }
 }
