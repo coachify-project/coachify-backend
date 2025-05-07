@@ -39,6 +39,7 @@ builder.Services.AddScoped<ITestSubmissionService, TestSubmissionService>();
 builder.Services.AddScoped<ITestSubmissionAnswerService, TestSubmissionAnswerService>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IUserCoachApplicationStatusService, UserCoachApplicationStatusService>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // 4. Add Controllers and Swagger
 builder.Services.AddControllers();
