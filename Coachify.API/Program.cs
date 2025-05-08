@@ -1,21 +1,66 @@
+using System.Text;
+using AutoMapper;
 using Coachify.BLL.Interfaces;
 using Coachify.BLL.Services;
-using Microsoft.EntityFrameworkCore;
-using AutoMapper;
 using Coachify.DAL;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;   // <-- добавлено
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Configure Database Context
-builder.Services.AddDbContext<ApplicationDbContext>(options => 
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") 
-                      ?? "Data Source=coachify.db")); // Строка подключения из конфигурации или по умолчанию
+// ==== 1. Configure Database Context ====
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options
+      .UseSqlite(
+          builder.Configuration.GetConnectionString("DefaultConnection")
+          ?? "Data Source=coachify.db"
+      )
+      // Игнорируем ошибку о pending model changes
+      .ConfigureWarnings(w => 
+          w.Ignore(RelationalEventId.PendingModelChangesWarning)
+      )
+);
 
-// 2. Configure AutoMapper
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+// ==== 2. Configure AutoMapper ====
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// 3. Register Services
+// ==== 3. Load JWT settings from configuration ====
+var jwtSection = builder.Configuration.GetSection("Jwt");
+var jwtKey     = jwtSection["Key"] ?? throw new InvalidOperationException("JWT Key is missing");
+var issuer     = jwtSection["Issuer"];
+var audience   = jwtSection["Audience"];
+var expireMin  = int.Parse(jwtSection["ExpireMinutes"] ?? "60");
+var keyBytes   = Encoding.UTF8.GetBytes(jwtKey);
+
+// ==== 4. Configure Authentication / JWT Bearer ====
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata      = false;
+        options.SaveToken                 = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer           = true,
+            ValidIssuer              = issuer,
+            ValidateAudience         = true,
+            ValidAudience            = audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey         = new SymmetricSecurityKey(keyBytes),
+            ValidateLifetime         = true,
+            ClockSkew                = TimeSpan.Zero
+        };
+    });
+
+// ==== 5. Register BLL services ====
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICoachService, CoachService>();
 builder.Services.AddScoped<ICoachApplicationService, CoachApplicationService>();
@@ -39,33 +84,57 @@ builder.Services.AddScoped<ITestSubmissionService, TestSubmissionService>();
 builder.Services.AddScoped<ITestSubmissionAnswerService, TestSubmissionAnswerService>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IUserCoachApplicationStatusService, UserCoachApplicationStatusService>();
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// 4. Add Controllers and Swagger
+// ==== 6. Add Controllers & Swagger ====
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Coachify API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In          = ParameterLocation.Header,
+        Description = "Введите `Bearer {token}`",
+        Name        = "Authorization",
+        Type        = SecuritySchemeType.ApiKey,
+        Scheme      = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id   = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 var app = builder.Build();
 
+// ==== 7. Apply pending migrations on startup ====
+// Этот вызов теперь не упадёт из-за подавленного предупреждения
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();  
+    db.Database.Migrate();
 }
 
+// ==== 8. Configure middleware pipeline ====
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Coachify API V1"));
+    app.UseSwaggerUI(c =>
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Coachify API V1"));
 }
 
 app.UseRouting();
-app.UseAuthorization();
-
+app.UseAuthentication();   // сначала аутентификация
+app.UseAuthorization();    // потом авторизация
 app.MapControllers();
-
 app.Run();

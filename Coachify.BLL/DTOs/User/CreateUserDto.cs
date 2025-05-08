@@ -12,6 +12,6 @@ public class CreateUserDto
     [EmailAddress]
     public string Email { get; set; }
     [Required]
-    public string PasswordHash { get; set; }
+    public string Password { get; set; }
     public int RoleId { get; set; }
 }

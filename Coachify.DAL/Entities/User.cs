@@ -10,9 +10,9 @@ public class User
     [Required, MaxLength(50)] public string FirstName { get; set; } = null!;
     [Required, MaxLength(50)] public string LastName { get; set; } = null!;
     [Required, MaxLength(50)] public string Email { get; set; } = null!;
-    [Required, MaxLength(255)] public string PasswordHash { get; set; } = null!;
+    [Required, MaxLength(255)] public byte[] PasswordHash { get; set; } = null!;
     [Required]
-    public string PasswordSalt { get; set; }
+    public byte[] PasswordSalt { get; set; }
 
     public int RoleId { get; set; }
     public Role Role { get; set; } = null!;

@@ -29,15 +29,13 @@ namespace Coachify.DAL
         public DbSet<User> Users { get; set; }
         public DbSet<UserCoachApplicationStatus> UserCoachApplicationStatuses { get; set; }
 
-        // Конструктор с DbContextOptions для корректной работы с DI
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        // Убираем конфигурацию соединения из OnConfiguring, так как это теперь выполняется через DI
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-             => optionsBuilder.UseSqlite("Data Source=coachify.db");
+            => optionsBuilder.UseSqlite("Data Source=coachify.db");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +45,13 @@ namespace Coachify.DAL
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+
+            // Seed initial roles
+            modelBuilder.Entity<Role>().HasData(
+                new Role { RoleId = 1, RoleName = "Admin" },
+                new Role { RoleId = 2, RoleName = "Client" },
+                new Role { RoleId = 3, RoleName = "Coach" }
+            );
 
             modelBuilder.Entity<Coach>()
                 .HasOne(c => c.User)
@@ -62,11 +67,11 @@ namespace Coachify.DAL
                 .HasOne(c => c.Category)
                 .WithMany(cat => cat.Courses)
                 .HasForeignKey(c => c.CategoryId);
-            
+
             modelBuilder.Entity<Test>()
                 .HasOne(t => t.Module)
                 .WithOne(m => m.Test)
-                .HasForeignKey<Test>(t => t.ModuleId); 
+                .HasForeignKey<Test>(t => t.ModuleId);
 
             // Relationships between Enrollment and User, Course, Payment, Certificate
             modelBuilder.Entity<Enrollment>()

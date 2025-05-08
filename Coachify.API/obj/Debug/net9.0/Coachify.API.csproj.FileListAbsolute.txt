@@ -368,3 +368,4 @@ C:\Users\Hp\Programming\CoachifyProject\coachify-backend\Coachify.API\obj\Debug\
 C:\Users\Hp\Programming\CoachifyProject\coachify-backend\Coachify.API\obj\Debug\net9.0\Coachify.API.pdb
 C:\Users\Hp\Programming\CoachifyProject\coachify-backend\Coachify.API\obj\Debug\net9.0\Coachify.API.genruntimeconfig.cache
 C:\Users\Hp\Programming\CoachifyProject\coachify-backend\Coachify.API\obj\Debug\net9.0\ref\Coachify.API.dll
+C:\Users\Hp\Programming\CoachifyProject\coachify-backend\Coachify.API\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
