@@ -39,7 +39,9 @@ public class UserCoachApplicationStatusService : IUserCoachApplicationStatusServ
     {
         var e = await _db.UserCoachApplicationStatuses.FindAsync(id);
         if (e == null) return;
-        _mapper.Map(dto, e);
+        
+        e.Name = dto.Name;
+
         await _db.SaveChangesAsync();
     }
 

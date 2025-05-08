@@ -1,7 +1,11 @@
-﻿namespace Coachify.BLL.DTOs.UserCoachApplicationStatus;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Coachify.BLL.DTOs.UserCoachApplicationStatus;
 
 public class UpdateUserCoachApplicationStatusDto
 {
-    public string Status { get; set; } = string.Empty;
-    
+    [Required]
+    public int StatusId { get;  }
+    [Required]
+    public string Name { get; set; } = null!;
 }

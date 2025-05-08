@@ -23,7 +23,7 @@ public class UserCoachApplicationStatusesController : ControllerBase
     public async Task<IActionResult> Create(CreateUserCoachApplicationStatusDto dto)
     {
         var c = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = c.Id }, c);
+        return CreatedAtAction(nameof(Get), new { id = c.StatusId }, c);
     }
 
     [HttpPut("{id}")]
