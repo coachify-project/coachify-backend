@@ -25,7 +25,7 @@ public class CoachApplicationsController : ControllerBase
     public async Task<IActionResult> Create(CreateCoachApplicationDto dto)
     {
         var c = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = c.Id }, c);
+        return CreatedAtAction(nameof(Get), new { id = c.ApplicationId }, c);
     }
 
     [HttpPut("{id}")]

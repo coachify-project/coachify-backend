@@ -13,5 +13,6 @@ public class CoachApplication
     public DateTime SubmittedAt { get; set; }
     public int StatusId { get; set; }
     public UserCoachApplicationStatus Status { get; set; } = null!;  // Pending, Approved, Rejected
-
+    public string Bio { get; set; }
+    public string Specialization { get; set; }
 }

@@ -2,6 +2,6 @@
 
 public class CreateCourseStatusDto
 {
-    public int StatusId { get; }
-    public string Name { get; set; }
+    public int StatusId { get; } 
+    public string Name { get; set; } 
 }

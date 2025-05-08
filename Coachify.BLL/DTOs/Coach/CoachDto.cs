@@ -3,6 +3,6 @@
 public class CoachDto
 {
     public int CoachId { get; set; }
-    public string Biography { get; set; }
+    public string Bio { get; set; }
     public int UserId { get; set; }
 }
