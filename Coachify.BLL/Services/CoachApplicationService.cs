@@ -27,7 +27,6 @@ public class CoachApplicationService : ICoachApplicationService
         return e == null ? null : _mapper.Map<CoachApplicationDto>(e);
     }
 
-    // НОВЫЙ МЕТОД: Получить все заявки со статусом Pending (StatusId == 1)
     public async Task<IEnumerable<CoachApplicationDto>> GetPendingApplicationsAsync()
     {
         var pending = await _db.CoachApplications
@@ -39,23 +38,20 @@ public class CoachApplicationService : ICoachApplicationService
 
     public async Task ApproveCoachApplicationAsync(int applicationId)
     {
-        // Найти заявку по ID
-        var application = await _db.CoachApplications.FindAsync(applicationId);
+        var application = await _db.CoachApplications
+            .Include(a => a.Applicant)
+            .FirstOrDefaultAsync(a => a.ApplicationId == applicationId);
+        
         if (application == null)
-        {
-            throw new ArgumentException("Application not found", nameof(applicationId));
-        }
-
-        // Проверка на текущий статус заявки (она должна быть в ожидании)
+            throw new InvalidOperationException("Application not found");
+        
         if (application.StatusId != 1) // Если статус не "Ожидает" (1)
         {
             throw new InvalidOperationException("Application is not in pending state.");
         }
-
-        // Обновление статуса заявки на "Одобрено"
+        
         application.StatusId = 2; // 2 - это статус "Одобрено"
-        application.SubmittedAt = DateTime.Now;
-
+        
         // Создаем профиль коуча, если заявка была одобрена
         var coach = new Coach
         {
@@ -65,9 +61,7 @@ public class CoachApplicationService : ICoachApplicationService
             Verified = true
         };
 
-        _db.Coaches.Add(coach); // Добавляем коуча в базу данных
-
-        // Сохраняем изменения в базе данных
+        _db.Coaches.Add(coach); 
         await _db.SaveChangesAsync();
     }
 
