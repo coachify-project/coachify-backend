@@ -53,10 +53,18 @@ namespace Coachify.DAL
                 new Role { RoleId = 3, RoleName = "Coach" }
             );
 
-            modelBuilder.Entity<Coach>()
-                .HasOne(c => c.User)
-                .WithOne(u => u.CoachProfile)
-                .HasForeignKey<Coach>(c => c.CoachId);
+            modelBuilder.Entity<Coach>(b =>
+            {
+                b.HasKey(c => c.CoachId);
+
+                b.HasOne(c => c.User)
+                    .WithOne(u => u.CoachProfile)
+                    .HasForeignKey<Coach>(c => c.CoachId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                b.Property(c => c.CoachId)
+                    .ValueGeneratedNever();
+            });
 
             modelBuilder.Entity<Course>()
                 .HasOne(c => c.Coach)

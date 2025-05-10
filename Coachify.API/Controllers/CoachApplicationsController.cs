@@ -9,10 +9,13 @@ namespace Coachify.API.Controllers;
 public class CoachApplicationsController : ControllerBase
 {
     private readonly ICoachApplicationService _service;
-    public CoachApplicationsController(ICoachApplicationService service) => _service = service;
+
+    public CoachApplicationsController(ICoachApplicationService service) 
+        => _service = service;
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() => Ok(await _service.GetAllAsync());
+    public async Task<IActionResult> GetAll() 
+        => Ok(await _service.GetAllAsync());
 
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
@@ -35,6 +38,31 @@ public class CoachApplicationsController : ControllerBase
         return NoContent();
     }
 
+    // Метод для одобрения заявки
+    [HttpPost("approve/{applicationId}")]
+    public async Task<IActionResult> ApproveCoachApplication(int applicationId)
+    {
+        try
+        {
+            await _service.ApproveCoachApplicationAsync(applicationId);
+            return Ok(new { message = "Application approved successfully" });
+        }
+        catch (Exception ex)
+        {
+            // Возвращаем ошибку с сообщением
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+    
+    [HttpGet("pending")]
+    public async Task<IActionResult> GetPendingApplications()
+    {
+        var pendingApplications = await _service.GetPendingApplicationsAsync();
+        return Ok(pendingApplications);
+    }
+
+
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id) => Ok(await _service.DeleteAsync(id));
+    public async Task<IActionResult> Delete(int id) 
+        => Ok(await _service.DeleteAsync(id));
 }

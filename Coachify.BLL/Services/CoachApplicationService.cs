@@ -27,12 +27,57 @@ public class CoachApplicationService : ICoachApplicationService
         return e == null ? null : _mapper.Map<CoachApplicationDto>(e);
     }
 
+    // НОВЫЙ МЕТОД: Получить все заявки со статусом Pending (StatusId == 1)
+    public async Task<IEnumerable<CoachApplicationDto>> GetPendingApplicationsAsync()
+    {
+        var pending = await _db.CoachApplications
+            .Where(a => a.StatusId == 1)
+            .ToListAsync();
+
+        return _mapper.Map<IEnumerable<CoachApplicationDto>>(pending);
+    }
+
+    public async Task ApproveCoachApplicationAsync(int applicationId)
+    {
+        // Найти заявку по ID
+        var application = await _db.CoachApplications.FindAsync(applicationId);
+        if (application == null)
+        {
+            throw new ArgumentException("Application not found", nameof(applicationId));
+        }
+
+        // Проверка на текущий статус заявки (она должна быть в ожидании)
+        if (application.StatusId != 1) // Если статус не "Ожидает" (1)
+        {
+            throw new InvalidOperationException("Application is not in pending state.");
+        }
+
+        // Обновление статуса заявки на "Одобрено"
+        application.StatusId = 2; // 2 - это статус "Одобрено"
+        application.SubmittedAt = DateTime.Now;
+
+        // Создаем профиль коуча, если заявка была одобрена
+        var coach = new Coach
+        {
+            CoachId = application.UserId,
+            Bio = application.Bio,
+            Specialization = application.Specialization,
+            Verified = true
+        };
+
+        _db.Coaches.Add(coach); // Добавляем коуча в базу данных
+
+        // Сохраняем изменения в базе данных
+        await _db.SaveChangesAsync();
+    }
+
+
     public async Task<CoachApplicationDto> CreateAsync(CreateCoachApplicationDto dto)
     {
         var e = _mapper.Map<CoachApplication>(dto);
         e.StatusId = 1;
         e.SubmittedAt = DateTime.Now;
-        
+
         _db.CoachApplications.Add(e);
         await _db.SaveChangesAsync();
         return _mapper.Map<CoachApplicationDto>(e);
@@ -42,26 +87,27 @@ public class CoachApplicationService : ICoachApplicationService
     {
         var e = await _db.CoachApplications.FindAsync(id);
         if (e == null) return;
-        
-        if(dto.Bio != null)
+
+        if (dto.Bio != null)
             e.Bio = dto.Bio;
-        
+
         bool wasPending = e.StatusId == 1;
         if (dto.StatusId.HasValue)
             e.StatusId = dto.StatusId.Value;
 
-        if (wasPending && dto.StatusId == 2) 
+        if (wasPending && dto.StatusId == 2)
         {
             var coach = new Coach
             {
-                CoachId = e.UserId,  // ID коуча = ID пользователя
-                User = e.Applicant,  // Привязываем пользователя
+                CoachId = e.UserId,
+                User = e.Applicant,
                 Bio = e.Bio,
                 Specialization = e.Specialization,
                 Verified = true
             };
             _db.Coaches.Add(coach);
         }
+
         await _db.SaveChangesAsync();
     }
 

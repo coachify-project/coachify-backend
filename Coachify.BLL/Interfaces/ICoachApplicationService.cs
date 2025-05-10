@@ -9,4 +9,7 @@ public interface ICoachApplicationService
     Task<CoachApplicationDto> CreateAsync(CreateCoachApplicationDto dto);
     Task UpdateAsync(int id, UpdateCoachApplicationDto dto);
     Task<bool> DeleteAsync(int id);
+    Task ApproveCoachApplicationAsync(int applicationId);
+    Task<IEnumerable<CoachApplicationDto>> GetPendingApplicationsAsync();
+
 }

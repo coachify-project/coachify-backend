@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Coachify.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250427205859_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250510181749_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -110,6 +110,9 @@ namespace Coachify.DAL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("Verified")
                         .HasColumnType("INTEGER");
 
@@ -123,6 +126,14 @@ namespace Coachify.DAL.Migrations
                     b.Property<int>("ApplicationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Bio")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Specialization")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("INTEGER");
@@ -466,6 +477,23 @@ namespace Coachify.DAL.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1,
+                            RoleName = "Admin"
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            RoleName = "Client"
+                        },
+                        new
+                        {
+                            RoleId = 3,
+                            RoleName = "Coach"
+                        });
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Test", b =>
@@ -587,14 +615,14 @@ namespace Coachify.DAL.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<byte[]>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("BLOB");
 
-                    b.Property<string>("PasswordSalt")
+                    b.Property<byte[]>("PasswordSalt")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("BLOB");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("INTEGER");
