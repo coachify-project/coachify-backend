@@ -21,12 +21,12 @@ public class CoachesController : ControllerBase
         return d == null ? NotFound() : Ok(d);
     }
 
-    [HttpPost]
+   /* [HttpPost]
     public async Task<IActionResult> Create(CreateCoachDto dto)
     {
         var c = await _service.CreateAsync(dto);
         return CreatedAtAction(nameof(Get), new { id = c.CoachId }, c);
-    }
+    }*/
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, UpdateCoachDto dto)

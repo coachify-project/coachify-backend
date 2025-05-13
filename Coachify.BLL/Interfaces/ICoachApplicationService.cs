@@ -12,4 +12,6 @@ public interface ICoachApplicationService
     Task ApproveCoachApplicationAsync(int applicationId);
     Task<IEnumerable<CoachApplicationDto>> GetPendingApplicationsAsync();
 
+    Task RejectCoachApplicationAsync(int applicationId);
+
 }

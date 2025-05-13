@@ -11,6 +11,8 @@ namespace Coachify.BLL.Mappings
             CreateMap<Enrollment, EnrollmentDto>().ReverseMap();
             CreateMap<Enrollment, CreateEnrollmentDto>().ReverseMap();
             CreateMap<Enrollment, UpdateEnrollmentDto>().ReverseMap();
+            CreateMap<EnrollmentStatus, EnrollmentStatusDto>();
+
         }
     }
 }

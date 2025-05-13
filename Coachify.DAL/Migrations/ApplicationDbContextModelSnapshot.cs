@@ -205,6 +205,28 @@ namespace Coachify.DAL.Migrations
                     b.HasKey("StatusId");
 
                     b.ToTable("CourseStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            StatusId = 1,
+                            Name = "Draft"
+                        },
+                        new
+                        {
+                            StatusId = 2,
+                            Name = "Pending"
+                        },
+                        new
+                        {
+                            StatusId = 3,
+                            Name = "Published"
+                        },
+                        new
+                        {
+                            StatusId = 4,
+                            Name = "Rejected"
+                        });
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Enrollment", b =>
@@ -225,6 +247,9 @@ namespace Coachify.DAL.Migrations
                     b.Property<int>("ProgressPercentage")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("StatusId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
@@ -232,9 +257,43 @@ namespace Coachify.DAL.Migrations
 
                     b.HasIndex("CourseId");
 
+                    b.HasIndex("StatusId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Enrollments");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.EnrollmentStatus", b =>
+                {
+                    b.Property<int>("StatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("StatusId");
+
+                    b.ToTable("EnrollmentStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            StatusId = 1,
+                            Name = "Not Started"
+                        },
+                        new
+                        {
+                            StatusId = 2,
+                            Name = "In Progress"
+                        },
+                        new
+                        {
+                            StatusId = 3,
+                            Name = "Completed"
+                        });
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Feedback", b =>
@@ -386,6 +445,28 @@ namespace Coachify.DAL.Migrations
                     b.HasKey("StatusId");
 
                     b.ToTable("ModuleStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            StatusId = 1,
+                            StatusName = "Draft"
+                        },
+                        new
+                        {
+                            StatusId = 2,
+                            StatusName = "Not Started"
+                        },
+                        new
+                        {
+                            StatusId = 3,
+                            StatusName = "In progress"
+                        },
+                        new
+                        {
+                            StatusId = 4,
+                            StatusName = "Completed"
+                        });
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.Payment", b =>
@@ -734,6 +815,12 @@ namespace Coachify.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Coachify.DAL.Entities.EnrollmentStatus", "Status")
+                        .WithMany("Enrollments")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Coachify.DAL.Entities.User", "User")
                         .WithMany("Enrollments")
                         .HasForeignKey("UserId")
@@ -741,6 +828,8 @@ namespace Coachify.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Course");
+
+                    b.Navigation("Status");
 
                     b.Navigation("User");
                 });
@@ -952,6 +1041,11 @@ namespace Coachify.DAL.Migrations
                     b.Navigation("Payment");
 
                     b.Navigation("TestSubmissions");
+                });
+
+            modelBuilder.Entity("Coachify.DAL.Entities.EnrollmentStatus", b =>
+                {
+                    b.Navigation("Enrollments");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.FeedbackStatus", b =>

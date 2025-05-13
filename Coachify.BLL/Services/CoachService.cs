@@ -27,13 +27,13 @@ public class CoachService : ICoachService
         return e == null ? null : _mapper.Map<CoachDto>(e);
     }
 
-    public async Task<CoachDto> CreateAsync(CreateCoachDto dto)
+   /* public async Task<CoachDto> CreateAsync(CreateCoachDto dto)
     {
         var e = _mapper.Map<Coach>(dto);
         _db.Coaches.Add(e);
         await _db.SaveChangesAsync();
         return _mapper.Map<CoachDto>(e);
-    }
+    }*/
 
     public async Task UpdateAsync(int id, UpdateCoachDto dto)
     {
@@ -45,10 +45,17 @@ public class CoachService : ICoachService
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var e = await _db.Coaches.FindAsync(id);
-        if (e == null) return false;
-        _db.Coaches.Remove(e);
+        var coach = await _db.Coaches.FindAsync(id);
+        if (coach == null) return false;
+
+        var user = await _db.Users.FindAsync(coach.CoachId); 
+
+        _db.Coaches.Remove(coach);
+        if (user != null)
+            _db.Users.Remove(user);
+
         await _db.SaveChangesAsync();
         return true;
     }
+
 }

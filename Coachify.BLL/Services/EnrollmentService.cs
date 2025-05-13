@@ -51,4 +51,50 @@ public class EnrollmentService : IEnrollmentService
         await _db.SaveChangesAsync();
         return true;
     }
+
+
+    public async Task<bool> EnrollUserAsync(int courseId, int userId)
+    {
+        var exists = await _db.Enrollments
+            .AnyAsync(e => e.CourseId == courseId && e.UserId == userId);
+
+        if (exists)
+            return false;
+
+        _db.Enrollments.Add(new Enrollment
+        {
+            CourseId = courseId,
+            UserId = userId,
+            StatusId = 1 // Not Started
+        });
+
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> StartCourseAsync(int courseId, int userId)
+    {
+        var enrollment = await _db.Enrollments
+            .FirstOrDefaultAsync(e => e.CourseId == courseId && e.UserId == userId);
+
+        if (enrollment == null || enrollment.StatusId != 1) // Not Started
+            return false;
+
+        enrollment.StatusId = 6; // In Progress
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> CompleteCourseAsync(int courseId, int userId)
+    {
+        var enrollment = await _db.Enrollments
+            .FirstOrDefaultAsync(e => e.CourseId == courseId && e.UserId == userId);
+
+        if (enrollment == null || enrollment.StatusId != 2) // In Progress
+            return false;
+
+        enrollment.StatusId = 3; // Completed
+        await _db.SaveChangesAsync();
+        return true;
+    }
 }

@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Coachify.DAL.Entities;
 
 public class Module
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int ModuleId { get; set; }
 
     [Required, MaxLength(255)] public string Title { get; set; } = null!;

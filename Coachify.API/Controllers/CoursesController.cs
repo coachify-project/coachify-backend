@@ -25,7 +25,7 @@ public class CoursesController : ControllerBase
     public async Task<IActionResult> Create(CreateCourseDto dto)
     {
         var c = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = c.Id }, c);
+        return CreatedAtAction(nameof(Get), new { id = c.CourseId }, c);
     }
 
     [HttpPut("{id}")]
@@ -37,4 +37,27 @@ public class CoursesController : ControllerBase
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id) => Ok(await _service.DeleteAsync(id));
+    
+    
+    [HttpPost("{id}/submit")]
+    public async Task<IActionResult> Submit(int id)
+    {
+        var result = await _service.SubmitCourseAsync(id);
+        return result ? Ok() : BadRequest("Course not in Draft status.");
+    }
+    
+    [HttpPost("{id}/approve")]
+    public async Task<IActionResult> Approve(int id)
+    {
+        var result = await _service.ApproveCourseAsync(id);
+        return result ? Ok() : BadRequest("Course not in Pending status.");
+    }
+
+    [HttpPost("{id}/reject")]
+    public async Task<IActionResult> Reject(int id)
+    {
+        var result = await _service.RejectCourseAsync(id);
+        return result ? Ok() : BadRequest("Course not in Pending status.");
+    }
+    
 }

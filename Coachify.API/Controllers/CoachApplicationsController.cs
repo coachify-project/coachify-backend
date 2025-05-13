@@ -38,7 +38,6 @@ public class CoachApplicationsController : ControllerBase
         return NoContent();
     }
 
-    // Метод для одобрения заявки
     [HttpPost("approve/{applicationId}")]
     public async Task<IActionResult> ApproveCoachApplication(int applicationId)
     {
@@ -49,10 +48,24 @@ public class CoachApplicationsController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Возвращаем ошибку с сообщением
             return BadRequest(new { message = ex.Message });
         }
     }
+    
+    [HttpPost("reject/{applicationId}")]
+    public async Task<IActionResult> RejectCoachApplication(int applicationId)
+    {
+        try
+        {
+            await _service.RejectCoachApplicationAsync(applicationId);
+            return Ok(new { message = "Application rejected successfully" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
     
     [HttpGet("pending")]
     public async Task<IActionResult> GetPendingApplications()

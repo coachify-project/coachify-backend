@@ -13,6 +13,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Course> Courses { get; set; }
     public DbSet<CourseStatus> CourseStatuses { get; set; }
     public DbSet<Enrollment> Enrollments { get; set; }
+    public DbSet<EnrollmentStatus> EnrollmentStatuses { get; set; }
     public DbSet<Feedback> Feedbacks { get; set; }
     public DbSet<FeedbackStatus> FeedbackStatuses { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
@@ -75,6 +76,11 @@ public class ApplicationDbContext : DbContext
             .HasOne(c => c.Category)
             .WithMany(cat => cat.Courses)
             .HasForeignKey(c => c.CategoryId);
+        
+        modelBuilder.Entity<Module>()
+            .Property(m => m.ModuleId)
+            .ValueGeneratedOnAdd();
+
 
         modelBuilder.Entity<Test>()
             .HasOne(t => t.Module)
@@ -143,20 +149,32 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(tsa => tsa.QuestionId);
 
         // Cascade delete configuration for related entities
-        modelBuilder.Entity<CourseStatus>()
-            .HasMany(cs => cs.Courses)
-            .WithOne(c => c.Status)
-            .HasForeignKey(c => c.StatusId);
+        modelBuilder.Entity<CourseStatus>().HasData(
+            new CourseStatus { StatusId = 1, Name = "Draft" },
+            new CourseStatus { StatusId = 2, Name = "Pending" },
+            new CourseStatus { StatusId = 3, Name = "Published" },
+            new CourseStatus { StatusId = 4, Name = "Rejected" }
+            );
+        
+        modelBuilder.Entity<EnrollmentStatus>().HasData(
+            new EnrollmentStatus { StatusId = 1, Name = "Not Started" },
+            new EnrollmentStatus { StatusId = 2, Name = "In Progress" },
+            new EnrollmentStatus { StatusId = 3, Name = "Completed" }
+        );
+
 
         modelBuilder.Entity<LessonStatus>()
             .HasMany(ls => ls.Lessons)
             .WithOne(l => l.Status)
             .HasForeignKey(l => l.StatusId);
 
-        modelBuilder.Entity<ModuleStatus>()
-            .HasMany(ms => ms.Modules)
-            .WithOne(m => m.Status)
-            .HasForeignKey(m => m.StatusId);
+        modelBuilder.Entity<ModuleStatus>().HasData(
+            new ModuleStatus { StatusId = 1, StatusName = "Draft" },
+            new ModuleStatus { StatusId = 2, StatusName = "Not Started" },
+            new ModuleStatus { StatusId = 3, StatusName = "In progress" },
+            new ModuleStatus { StatusId = 4, StatusName = "Completed" }
+            );
+        
 
         modelBuilder.Entity<PaymentStatus>()
             .HasMany(ps => ps.Payments)

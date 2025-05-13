@@ -6,7 +6,7 @@ namespace Coachify.BLL.Interfaces
     {
         Task<IEnumerable<CoachDto>> GetAllAsync();
         Task<CoachDto?> GetByIdAsync(int id);
-        Task<CoachDto> CreateAsync(CreateCoachDto dto);
+        //Task<CoachDto> CreateAsync(CreateCoachDto dto);
         Task UpdateAsync(int id, UpdateCoachDto dto);
         Task<bool> DeleteAsync(int id);
     }

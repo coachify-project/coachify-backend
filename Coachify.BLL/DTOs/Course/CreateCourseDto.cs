@@ -2,8 +2,11 @@
 
 public class CreateCourseDto
 {
-    public string Title { get; set; }
-    public int CoachId { get; set; }
+    public string Title { get; set; } = null!;
     public int CategoryId { get; set; }
-    public int StatusId { get; set; } = 1;
+    public int CoachId { get; set; }
+
+    public string Description { get; set; } = null!;
+    public double Price { get; set; }
+    public int MaxClients { get; set; }
 }

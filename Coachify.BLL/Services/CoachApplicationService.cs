@@ -45,14 +45,13 @@ public class CoachApplicationService : ICoachApplicationService
         if (application == null)
             throw new InvalidOperationException("Application not found");
         
-        if (application.StatusId != 1) // Если статус не "Ожидает" (1)
+        if (application.StatusId != 1) 
         {
             throw new InvalidOperationException("Application is not in pending state.");
         }
         
-        application.StatusId = 2; // 2 - это статус "Одобрено"
+        application.StatusId = 2; 
         
-        // Создаем профиль коуча, если заявка была одобрена
         var coach = new Coach
         {
             CoachId = application.UserId,
@@ -64,6 +63,21 @@ public class CoachApplicationService : ICoachApplicationService
         _db.Coaches.Add(coach); 
         await _db.SaveChangesAsync();
     }
+    
+    public async Task RejectCoachApplicationAsync(int applicationId)
+    {
+        var application = await _db.CoachApplications.FindAsync(applicationId);
+
+        if (application == null)
+            throw new InvalidOperationException("Application not found.");
+
+        if (application.StatusId != 1) 
+            throw new InvalidOperationException("Only pending applications can be rejected.");
+
+        application.StatusId = 3; 
+        await _db.SaveChangesAsync();
+    }
+
 
 
     public async Task<CoachApplicationDto> CreateAsync(CreateCoachApplicationDto dto)

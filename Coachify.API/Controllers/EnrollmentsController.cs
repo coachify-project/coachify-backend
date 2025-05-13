@@ -37,4 +37,25 @@ public class EnrollmentsController : ControllerBase
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id) => Ok(await _service.DeleteAsync(id));
+    
+    [HttpPost("{courseId}/enroll")]
+    public async Task<IActionResult> EnrollUser(int courseId, [FromQuery] int userId)
+    {
+        var success = await _service.EnrollUserAsync(courseId, userId);
+        return success ? Ok() : BadRequest("User is already enrolled.");
+    }
+
+    [HttpPost("{courseId}/start")]
+    public async Task<IActionResult> StartCourse(int courseId, [FromQuery] int userId)
+    {
+        var success = await _service.StartCourseAsync(courseId, userId);
+        return success ? Ok() : BadRequest("Cannot start course.");
+    }
+
+    [HttpPost("{courseId}/complete")]
+    public async Task<IActionResult> CompleteCourse(int courseId, [FromQuery] int userId)
+    {
+        var success = await _service.CompleteCourseAsync(courseId, userId);
+        return success ? Ok() : BadRequest("Cannot complete course.");
+    }
 }
