@@ -25,7 +25,7 @@ public class ModulesController : ControllerBase
     public async Task<IActionResult> Create(CreateModuleDto dto)
     {
         var c = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = c.Id }, c);
+        return CreatedAtAction(nameof(Get), new { id = c.ModuleId }, c);
     }
 
     [HttpPut("{id}")]

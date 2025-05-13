@@ -24,6 +24,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<PaymentStatus> PaymentStatuses { get; set; }
     public DbSet<Question> Questions { get; set; }
     public DbSet<Role> Roles { get; set; }
+    public DbSet<Skill> Skills { get; set; }
     public DbSet<Test> Tests { get; set; }
     public DbSet<TestSubmission> TestSubmissions { get; set; }
     public DbSet<TestSubmissionAnswer> TestSubmissionAnswers { get; set; }
@@ -78,8 +79,9 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(c => c.CategoryId);
         
         modelBuilder.Entity<Module>()
-            .Property(m => m.ModuleId)
-            .ValueGeneratedOnAdd();
+            .HasMany(m => m.Skills)
+            .WithMany(s => s.Modules)
+            .UsingEntity(j => j.ToTable("ModuleSkill"));
 
 
         modelBuilder.Entity<Test>()

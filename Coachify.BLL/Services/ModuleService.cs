@@ -29,11 +29,44 @@ public class ModuleService : IModuleService
 
     public async Task<ModuleDto> CreateAsync(CreateModuleDto dto)
     {
-        var e = _mapper.Map<Module>(dto);
-        _db.Modules.Add(e);
+        var module = new Module
+        {
+            Title = dto.Title,
+            CourseId = dto.CourseId,
+            StatusId = dto.StatusId
+        };
+
+        // Добавление навыков (если есть)
+        foreach (var skillName in dto.SkillNames.Distinct())
+        {
+            var existingSkill = await _db.Skills
+                .FirstOrDefaultAsync(s => s.Name.ToLower() == skillName.ToLower());
+
+            if (existingSkill != null)
+            {
+                module.Skills.Add(existingSkill);
+            }
+            else
+            {
+                var newSkill = new Skill { Name = skillName };
+                _db.Skills.Add(newSkill);
+                module.Skills.Add(newSkill);
+            }
+        }
+
+        _db.Modules.Add(module);
         await _db.SaveChangesAsync();
-        return _mapper.Map<ModuleDto>(e);
+
+        return new ModuleDto
+        {
+            ModuleId = module.ModuleId,
+            Title = module.Title,
+            CourseId = module.CourseId,
+            StatusId = module.StatusId,
+            SkillNames = module.Skills.Select(s => s.Name).ToList()
+        };
     }
+
 
     public async Task UpdateAsync(int id, UpdateModuleDto dto)
     {

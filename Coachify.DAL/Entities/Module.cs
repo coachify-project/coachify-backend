@@ -13,12 +13,15 @@ public class Module
 
     public int CourseId { get; set; }
     public Course Course { get; set; } = null!;
-    
+
     public int StatusId { get; set; }
     public ModuleStatus? Status { get; set; }
 
+    public ICollection<Skill> Skills { get; set; } = new List<Skill>();
+
+
     public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
-    
-    public int? TestId { get; set; } 
+
+    public int? TestId { get; set; }
     public Test? Test { get; set; }
 }
