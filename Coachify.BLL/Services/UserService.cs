@@ -26,27 +26,23 @@ namespace Coachify.BLL.Services
             _mapper = mapper;
             _config = config;
         }
-
-        // Получить всех пользователей
+        
         public async Task<IEnumerable<UserDto>> GetAllAsync()
         {
             var users = await _db.Users.ToListAsync();
             return _mapper.Map<IEnumerable<UserDto>>(users);
         }
 
-        // Получить пользователя по ID
         public async Task<UserDto?> GetByIdAsync(int id)
         {
             var user = await _db.Users.FindAsync(id);
             return user == null ? null : _mapper.Map<UserDto>(user);
         }
 
-        // Админская операция: создать пользователя
         public async Task<UserDto> CreateAsync(CreateUserDto dto)
         {
             var user = _mapper.Map<User>(dto);
-
-            // Хешируем пароль перед сохранением
+            
             using var hmac = new HMACSHA256();
             user.PasswordSalt = hmac.Key;
             user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password));
@@ -57,7 +53,6 @@ namespace Coachify.BLL.Services
             return _mapper.Map<UserDto>(user);
         }
 
-        // Админская операция: обновить пользователя
         public async Task UpdateAsync(int id, UpdateUserDto dto)
         {
             var user = await _db.Users.FindAsync(id);
@@ -66,7 +61,6 @@ namespace Coachify.BLL.Services
             await _db.SaveChangesAsync();
         }
 
-        // Админская операция: удалить пользователя
         public async Task<bool> DeleteAsync(int id)
         {
             var user = await _db.Users.FindAsync(id);
@@ -76,26 +70,21 @@ namespace Coachify.BLL.Services
             return true;
         }
 
-        // Регистрация пользователя
         public async Task<bool> RegisterAsync(CreateUserDto dto)
         {
-            // Проверка на существующий email
             var emailExists = await _db.Users.AnyAsync(u => u.Email == dto.Email);
             if (emailExists)
-                return false; // Email уже существует
+                return false; 
 
             var user = _mapper.Map<User>(dto);
-
-            // Хешируем пароль перед сохранением
+            
             using var hmac = new HMACSHA256();
             user.PasswordSalt = hmac.Key;
             user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password));
-
-            // Присваиваем роль
+            
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.RoleName == "Client");
             if (role == null)
             {
-                // Если роль "Client" не найдена, создаем её
                 role = new Role { RoleName = "Client" };
                 _db.Roles.Add(role);
                 await _db.SaveChangesAsync();
@@ -106,10 +95,9 @@ namespace Coachify.BLL.Services
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
 
-            return true; // Регистрация прошла успешно
+            return true; 
         }
-
-        // Вход: проверка и генерация JWT
+        
         public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
         {
             var user = await _db.Users
@@ -125,8 +113,7 @@ namespace Coachify.BLL.Services
 
             if (!computedHash.SequenceEqual(user.PasswordHash))
                 throw new UnauthorizedAccessException("Неверный email или пароль");
-
-            // Формирование JWT
+            
             var jwtSection = _config.GetSection("Jwt");
             var keyBytes = Encoding.UTF8.GetBytes(jwtSection["Key"]!);
             var claims = new List<Claim>

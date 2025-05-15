@@ -10,7 +10,7 @@ public interface ICourseService
     Task UpdateAsync(int id, UpdateCourseDto dto);
     Task<bool> DeleteAsync(int id);
 
-    Task<bool> SubmitCourseAsync(int courseId);
+    Task<bool> SubmitCourseAsync(int courseId, int coachId);
     Task<bool> ApproveCourseAsync(int courseId);
     Task<bool> RejectCourseAsync(int courseId);
     Task<bool> StartCourseAsync(int courseId, int userId);

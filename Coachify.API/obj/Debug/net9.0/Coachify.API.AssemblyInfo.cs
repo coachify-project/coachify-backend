@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Coachify.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f366fea27dc8c0a7999a2d5685e1153c76093253")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f14fabeaf5f085859499b48701d5b83b70f3f557")]
 [assembly: System.Reflection.AssemblyProductAttribute("Coachify.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Coachify.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

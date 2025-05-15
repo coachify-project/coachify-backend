@@ -61,6 +61,11 @@ public class CoachApplicationService : ICoachApplicationService
         };
 
         _db.Coaches.Add(coach); 
+        if (application.Applicant != null)
+        {
+            application.Applicant.RoleId = 3; 
+        }
+        
         await _db.SaveChangesAsync();
     }
     
@@ -83,13 +88,20 @@ public class CoachApplicationService : ICoachApplicationService
     public async Task<CoachApplicationDto> CreateAsync(CreateCoachApplicationDto dto)
     {
         var e = _mapper.Map<CoachApplication>(dto);
-        e.StatusId = 1;
+        e.StatusId = 2;
         e.SubmittedAt = DateTime.Now;
+
+        var user = await _db.Users.FindAsync(dto.UserId);
+        if (user != null)
+        {
+            user.RoleId = 2; 
+        }
 
         _db.CoachApplications.Add(e);
         await _db.SaveChangesAsync();
         return _mapper.Map<CoachApplicationDto>(e);
     }
+
 
     public async Task UpdateAsync(int id, UpdateCoachApplicationDto dto)
     {

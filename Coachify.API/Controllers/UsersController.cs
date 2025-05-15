@@ -20,9 +20,13 @@ public class UsersController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(CreateUserDto dto)
     {
-        await _service.RegisterAsync(dto);
+        var success = await _service.RegisterAsync(dto);
+        if (!success)
+            return Conflict("Email уже зарегистрирован.");
+    
         return Ok("Зарегистрировано");
     }
+
     
     
     [HttpGet]

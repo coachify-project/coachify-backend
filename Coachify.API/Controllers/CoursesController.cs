@@ -40,9 +40,9 @@ public class CoursesController : ControllerBase
     
     
     [HttpPost("{id}/submit")]
-    public async Task<IActionResult> Submit(int id)
+    public async Task<IActionResult> Submit(int courseId, int coachId)
     {
-        var result = await _service.SubmitCourseAsync(id);
+        var result = await _service.SubmitCourseAsync(courseId, coachId);
         return result ? Ok() : BadRequest("Course not in Draft status.");
     }
     

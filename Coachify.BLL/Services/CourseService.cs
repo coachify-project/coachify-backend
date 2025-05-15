@@ -63,24 +63,27 @@ public class CourseService : ICourseService
         await _db.SaveChangesAsync();
         return true;
     }
-    public async Task<bool> SubmitCourseAsync(int courseId)
+    public async Task<bool> SubmitCourseAsync(int courseId, int coachId)
     {
-        var course = await _db.Courses.FindAsync(courseId);
-        if (course == null || course.StatusId != 1) // только если статус Draft
+        var course = await _db.Courses
+            .FirstOrDefaultAsync(c => c.CourseId == courseId && c.CoachId == coachId);
+
+        if (course == null || course.StatusId != 1) //draft
             return false;
 
-        course.StatusId = 2; // Pending
+        course.StatusId = 2; //pending
         await _db.SaveChangesAsync();
         return true;
     }
+
     
     public async Task<bool> ApproveCourseAsync(int courseId)
     {
         var course = await _db.Courses.FindAsync(courseId);
-        if (course == null || course.StatusId != 2) // Только если статус Pending
+        if (course == null || course.StatusId != 2) //pending
             return false;
 
-        course.StatusId = 3; // Published
+        course.StatusId = 3; //published
         await _db.SaveChangesAsync();
         return true;
     }
@@ -88,10 +91,10 @@ public class CourseService : ICourseService
     public async Task<bool> RejectCourseAsync(int courseId)
     {
         var course = await _db.Courses.FindAsync(courseId);
-        if (course == null || course.StatusId != 2) // Только если статус Pending
+        if (course == null || course.StatusId != 2) // pending
             return false;
 
-        course.StatusId = 4; // Rejected
+        course.StatusId = 4; // rejected
         await _db.SaveChangesAsync();
         return true;
     }

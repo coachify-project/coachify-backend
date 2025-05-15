@@ -10,7 +10,8 @@ public class UserProfile : Profile
     {
         CreateMap<CreateUserDto, User>()
             .ForMember(dest => dest.UserId, opt => opt.Ignore())
-            .ForMember(dest => dest.PasswordSalt, opt => opt.Ignore()); 
+            .ForMember(dest => dest.PasswordSalt, opt => opt.Ignore())
+            .ForMember(dest => dest.RoleId, opt => opt.Ignore());; 
 
         CreateMap<UpdateUserDto, User>()
             .ForMember(dest => dest.UserId, opt => opt.Ignore())
