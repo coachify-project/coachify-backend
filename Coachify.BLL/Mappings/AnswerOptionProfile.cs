@@ -8,8 +8,9 @@ namespace Coachify.BLL.Mappings
     {
         public AnswerOptionProfile()
         {
-            CreateMap<AnswerOption, AnswerOptionDto>().ReverseMap();
-            CreateMap<AnswerOption, CreateAnswerOptionDto>().ReverseMap();
+            CreateMap<AnswerOption, AnswerOptionDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.OptionId));
+            CreateMap<CreateAnswerOptionDto, AnswerOption>().ReverseMap();
             CreateMap<AnswerOption, UpdateAnswerOptionDto>().ReverseMap();
         }
     }
