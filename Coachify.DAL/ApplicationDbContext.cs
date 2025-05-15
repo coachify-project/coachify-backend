@@ -77,11 +77,18 @@ public class ApplicationDbContext : DbContext
             .HasOne(c => c.Category)
             .WithMany(cat => cat.Courses)
             .HasForeignKey(c => c.CategoryId);
-        
+
         modelBuilder.Entity<Module>()
             .HasMany(m => m.Skills)
             .WithMany(s => s.Modules)
             .UsingEntity(j => j.ToTable("ModuleSkill"));
+
+        modelBuilder.Entity<Lesson>()
+            .HasOne(l => l.Status)
+            .WithMany()
+            .HasForeignKey(l => l.StatusId);
+        
+
 
 
         modelBuilder.Entity<Test>()
@@ -156,8 +163,8 @@ public class ApplicationDbContext : DbContext
             new CourseStatus { StatusId = 2, Name = "Pending" },
             new CourseStatus { StatusId = 3, Name = "Published" },
             new CourseStatus { StatusId = 4, Name = "Rejected" }
-            );
-        
+        );
+
         modelBuilder.Entity<EnrollmentStatus>().HasData(
             new EnrollmentStatus { StatusId = 1, Name = "Not Started" },
             new EnrollmentStatus { StatusId = 2, Name = "In Progress" },
@@ -165,18 +172,21 @@ public class ApplicationDbContext : DbContext
         );
 
 
-        modelBuilder.Entity<LessonStatus>()
-            .HasMany(ls => ls.Lessons)
-            .WithOne(l => l.Status)
-            .HasForeignKey(l => l.StatusId);
+        modelBuilder.Entity<LessonStatus>().HasData(
+            new LessonStatus { StatusId = 1, StatusName = "Draft" },
+            new LessonStatus { StatusId = 2, StatusName = "Not Started" },
+            new LessonStatus { StatusId = 3, StatusName = "In Progress" },
+            new LessonStatus { StatusId = 4, StatusName = "Completed" }
+        );
+
 
         modelBuilder.Entity<ModuleStatus>().HasData(
             new ModuleStatus { StatusId = 1, StatusName = "Draft" },
             new ModuleStatus { StatusId = 2, StatusName = "Not Started" },
             new ModuleStatus { StatusId = 3, StatusName = "In progress" },
             new ModuleStatus { StatusId = 4, StatusName = "Completed" }
-            );
-        
+        );
+
 
         modelBuilder.Entity<PaymentStatus>()
             .HasMany(ps => ps.Payments)

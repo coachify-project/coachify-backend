@@ -24,9 +24,10 @@ public class LessonsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateLessonDto dto)
     {
-        var c = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = c.Id }, c);
+        var createdLesson = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(Get), new { id = createdLesson.LessonId }, createdLesson);
     }
+
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, UpdateLessonDto dto)

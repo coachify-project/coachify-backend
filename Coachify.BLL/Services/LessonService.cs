@@ -29,10 +29,36 @@ public class LessonService : ILessonService
 
     public async Task<LessonDto> CreateAsync(CreateLessonDto dto)
     {
-        var e = _mapper.Map<Lesson>(dto);
-        _db.Lessons.Add(e);
+        // Пример: преобразование YouTube-ссылки в embed
+        string videoUrl = ProcessVideoUrl(dto.VideoUrl);
+
+        var lesson = new Lesson
+        {
+            Title = dto.Title,
+            Introduction = dto.Introduction,
+            LessonObjectives = dto.LessonObjectives,
+            VideoUrl = videoUrl,
+            ModuleId = dto.ModuleId,
+            
+            
+            StatusId = 1
+        };
+
+        _db.Lessons.Add(lesson);
         await _db.SaveChangesAsync();
-        return _mapper.Map<LessonDto>(e);
+        
+        return _mapper.Map<LessonDto>(lesson);
+    }
+    
+    private string ProcessVideoUrl(string url)
+    {
+        if (url.Contains("youtube.com/watch?v="))
+        {
+            var videoId = url.Split("v=")[1].Split('&')[0];
+            return $"https://www.youtube.com/embed/{videoId}";
+        }
+
+        return url;
     }
 
     public async Task UpdateAsync(int id, UpdateLessonDto dto)

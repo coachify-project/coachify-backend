@@ -3,6 +3,7 @@ using System;
 using Coachify.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Coachify.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250515104516_FixModuleStatuses")]
+    partial class FixModuleStatuses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.4");
@@ -354,16 +357,13 @@ namespace Coachify.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Introduction")
+                    b.Property<string>("Description")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("LessonObjectives")
+                    b.Property<string>("LessonMaterials")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
-
-                    b.Property<int?>("LessonStatusStatusId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<int>("ModuleId")
                         .HasColumnType("INTEGER");
@@ -377,13 +377,10 @@ namespace Coachify.DAL.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("VideoUrl")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.HasKey("LessonId");
-
-                    b.HasIndex("LessonStatusStatusId");
 
                     b.HasIndex("ModuleId");
 
@@ -922,10 +919,6 @@ namespace Coachify.DAL.Migrations
 
             modelBuilder.Entity("Coachify.DAL.Entities.Lesson", b =>
                 {
-                    b.HasOne("Coachify.DAL.Entities.LessonStatus", null)
-                        .WithMany("Lessons")
-                        .HasForeignKey("LessonStatusStatusId");
-
                     b.HasOne("Coachify.DAL.Entities.Module", "Module")
                         .WithMany("Lessons")
                         .HasForeignKey("ModuleId")
@@ -933,7 +926,7 @@ namespace Coachify.DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("Coachify.DAL.Entities.LessonStatus", "Status")
-                        .WithMany()
+                        .WithMany("Lessons")
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
