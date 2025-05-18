@@ -1,150 +1,131 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using AutoMapper;
-using Coachify.BLL.DTOs.Auth;
-using Coachify.BLL.DTOs.User;
+﻿using Coachify.BLL.DTOs.User;
 using Coachify.BLL.Interfaces;
 using Coachify.DAL;
 using Coachify.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Coachify.BLL.Services
 {
     public class UserService : IUserService
     {
-        private readonly ApplicationDbContext _db;
-        private readonly IMapper _mapper;
-        private readonly IConfiguration _config;
+        private readonly ApplicationDbContext _context;
 
-        public UserService(ApplicationDbContext db, IMapper mapper, IConfiguration config)
+        public UserService(ApplicationDbContext context)
         {
-            _db = db;
-            _mapper = mapper;
-            _config = config;
-        }
-        
-        public async Task<IEnumerable<UserDto>> GetAllAsync()
-        {
-            var users = await _db.Users.ToListAsync();
-            return _mapper.Map<IEnumerable<UserDto>>(users);
-        }
-
-        public async Task<UserDto?> GetByIdAsync(int id)
-        {
-            var user = await _db.Users.FindAsync(id);
-            return user == null ? null : _mapper.Map<UserDto>(user);
-        }
-
-        public async Task<UserDto> CreateAsync(CreateUserDto dto)
-        {
-            var user = _mapper.Map<User>(dto);
-            
-            using var hmac = new HMACSHA256();
-            user.PasswordSalt = hmac.Key;
-            user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password));
-
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
-
-            return _mapper.Map<UserDto>(user);
-        }
-
-        public async Task UpdateAsync(int id, UpdateUserDto dto)
-        {
-            var user = await _db.Users.FindAsync(id);
-            if (user == null) return;
-            _mapper.Map(dto, user);
-            await _db.SaveChangesAsync();
-        }
-
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var user = await _db.Users.FindAsync(id);
-            if (user == null) return false;
-            _db.Users.Remove(user);
-            await _db.SaveChangesAsync();
-            return true;
+            _context = context;
         }
 
         public async Task<bool> RegisterAsync(CreateUserDto dto)
         {
-            var emailExists = await _db.Users.AnyAsync(u => u.Email == dto.Email);
-            if (emailExists)
-                return false; 
+            if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+                return false;
 
-            var user = _mapper.Map<User>(dto);
-            
-            using var hmac = new HMACSHA256();
-            user.PasswordSalt = hmac.Key;
-            user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password));
-            
-            var role = await _db.Roles.FirstOrDefaultAsync(r => r.RoleName == "Client");
-            if (role == null)
+            using var hmac = new HMACSHA512();
+
+            var user = new User
             {
-                role = new Role { RoleName = "Client" };
-                _db.Roles.Add(role);
-                await _db.SaveChangesAsync();
-            }
+                Email = dto.Email,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                PasswordSalt = hmac.Key,
+                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password)),
+                RoleId = 2 // например, обычный пользователь
+            };
 
-            user.RoleId = role.RoleId;
-
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
-
-            return true; 
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return true;
         }
-        
-        public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
+
+        public async Task<UserDto?> AuthenticateAsync(string email, string password)
         {
-            var user = await _db.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Email == dto.Email);
+            var user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email == email);
 
             if (user == null)
-                throw new UnauthorizedAccessException("Неверный email или пароль");
+                return null;
 
-            using var hmac = new HMACSHA256(user.PasswordSalt);
-            var computedHash = hmac
-                .ComputeHash(Encoding.UTF8.GetBytes(dto.Password));
+            using var hmac = new HMACSHA512(user.PasswordSalt);
+            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
 
-            if (!computedHash.SequenceEqual(user.PasswordHash))
-                throw new UnauthorizedAccessException("Неверный email или пароль");
-            
-            var jwtSection = _config.GetSection("Jwt");
-            var keyBytes = Encoding.UTF8.GetBytes(jwtSection["Key"]!);
-            var claims = new List<Claim>
+            for (int i = 0; i < computedHash.Length; i++)
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
-                new Claim(ClaimTypes.Role, user.Role.RoleName)
-            };
+                if (computedHash[i] != user.PasswordHash[i])
+                    return null;
+            }
 
-            var creds = new SigningCredentials(
-                new SymmetricSecurityKey(keyBytes),
-                SecurityAlgorithms.HmacSha256);
-
-            var expires = DateTime.UtcNow
-                          .AddMinutes(double.Parse(jwtSection["ExpireMinutes"]!));
-
-            var token = new JwtSecurityToken(
-                issuer: jwtSection["Issuer"],
-                audience: jwtSection["Audience"],
-                claims: claims,
-                expires: expires,
-                signingCredentials: creds);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return new AuthResponseDto
+            return new UserDto
             {
-                Token = jwt,
-                ExpiresAt = expires
+                Id = user.UserId,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                RoleId = user.RoleId
             };
+        }
+
+        public async Task<IEnumerable<UserDto>> GetAllAsync()
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Select(u => new UserDto
+                {
+                    Id = u.UserId,
+                    Email = u.Email,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    RoleId = u.RoleId
+                })
+                .ToListAsync();
+        }
+
+        public async Task<UserDto?> GetByIdAsync(int id)
+        {
+            var user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.UserId == id);
+
+            if (user == null)
+                return null;
+
+            return new UserDto
+            {
+                Id = user.UserId,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                RoleId = user.RoleId
+            };
+        }
+
+        public async Task UpdateAsync(int id, UpdateUserDto dto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == id);
+            if (user == null)
+                throw new KeyNotFoundException("User not found");
+
+            user.FirstName = dto.FirstName;
+            user.LastName = dto.LastName;
+            // обновление email и пароля по желанию, здесь не делаем
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+                return false;
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

@@ -1,9 +1,10 @@
-﻿namespace Coachify.API.Settings;
-
-public class JwtSettings
+﻿namespace Coachify.API.Settings
 {
-    public string Key { get; set; } = null!;
-    public string Issuer { get; set; } = null!;
-    public string Audience { get; set; } = null!;
-    public int TokenLifetimeMinutes { get; set; }
+    public class JwtSettings
+    {
+        public string Key { get; set; } = null!;
+        public string Issuer { get; set; } = null!;
+        public string Audience { get; set; } = null!;
+        public int TokenLifetimeMinutes { get; set; }
+    }
 }
