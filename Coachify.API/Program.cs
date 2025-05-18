@@ -5,7 +5,7 @@ using Coachify.BLL.Services;
 using Coachify.DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;   // <-- добавлено
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -20,7 +20,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
           ?? "Data Source=coachify.db"
       )
       // Игнорируем ошибку о pending model changes
-      .ConfigureWarnings(w => 
+      .ConfigureWarnings(w =>
           w.Ignore(RelationalEventId.PendingModelChangesWarning)
       )
 );
@@ -86,8 +86,23 @@ builder.Services.AddScoped<ITestSubmissionAnswerService, TestSubmissionAnswerSer
 builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IUserCoachApplicationStatusService, UserCoachApplicationStatusService>();
 
-// ==== 6. Add Controllers & Swagger ====
+// ==== 6. Add Controllers, CORS & Swagger ====
+
+// Добавляем контроллеры
 builder.Services.AddControllers();
+
+// Добавляем CORS с разрешением для всех источников
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -119,7 +134,6 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // ==== 7. Apply pending migrations on startup ====
-// Этот вызов теперь не упадёт из-за подавленного предупреждения
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -135,7 +149,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
-app.UseAuthentication();   // сначала аутентификация
-app.UseAuthorization();    // потом авторизация
+
+// Включаем CORS (до аутентификации и авторизации)
+app.UseCors();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();

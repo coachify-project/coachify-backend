@@ -9,8 +9,9 @@ namespace Coachify.BLL.Mappings
         public CourseProfile()
         {
             CreateMap<Course, CourseDto>()
-                .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.CourseId));
-            CreateMap<CreateCourseDto, Course>(); // только в одну сторону
+                .ForMember(dest => dest.Modules,
+                    opt => opt.MapFrom(src => src.Modules));
+            CreateMap<CreateCourseDto, Course>(); 
             CreateMap<Course, UpdateCourseDto>().ReverseMap();
         }
     }

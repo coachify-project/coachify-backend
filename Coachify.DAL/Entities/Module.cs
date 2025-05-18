@@ -10,6 +10,7 @@ public class Module
     public int ModuleId { get; set; }
 
     [Required, MaxLength(255)] public string Title { get; set; } = null!;
+    [Required, MaxLength(255)] public string Description{ get; set; } 
 
     public int CourseId { get; set; }
     public Course Course { get; set; } = null!;

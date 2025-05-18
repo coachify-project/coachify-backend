@@ -1,8 +1,12 @@
-﻿namespace Coachify.BLL.DTOs.Question;
+﻿using Coachify.BLL.DTOs.AnswerOption;
+
+namespace Coachify.BLL.DTOs.Question;
 
 public class QuestionDto
 {
     public int QuestionId { get; set; }
     public string Text { get; set; }
     public int TestId { get; set; }
+    
+    public List<AnswerOptionDto> Options { get; set; } = new();
 }

@@ -1,61 +1,109 @@
 ﻿using Coachify.BLL.DTOs.Enrollment;
 using Coachify.BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
-namespace Coachify.API.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class EnrollmentsController : ControllerBase
+namespace Coachify.API.Controllers
 {
-    private readonly IEnrollmentService _service;
-    public EnrollmentsController(IEnrollmentService service) => _service = service;
-
-    [HttpGet]
-    public async Task<IActionResult> GetAll() => Ok(await _service.GetAllAsync());
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> Get(int id)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class EnrollmentsController : ControllerBase
     {
-        var d = await _service.GetByIdAsync(id);
-        return d == null ? NotFound() : Ok(d);
-    }
+        private readonly IEnrollmentService _enrollmentService;
 
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateEnrollmentDto dto)
-    {
-        var c = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = c.Id }, c);
-    }
+        public EnrollmentsController(IEnrollmentService enrollmentService)
+        {
+            _enrollmentService = enrollmentService;
+        }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateEnrollmentDto dto)
-    {
-        await _service.UpdateAsync(id, dto);
-        return NoContent();
-    }
+        // GET: api/enrollments
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var enrollments = await _enrollmentService.GetAllAsync();
+            return Ok(enrollments);
+        }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id) => Ok(await _service.DeleteAsync(id));
-    
-    [HttpPost("{courseId}/enroll")]
-    public async Task<IActionResult> EnrollUser(int courseId, [FromQuery] int userId)
-    {
-        var success = await _service.EnrollUserAsync(courseId, userId);
-        return success ? Ok() : BadRequest("User is already enrolled.");
-    }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var enrollment = await _enrollmentService.GetByIdAsync(id);
+            if (enrollment == null)
+                return NotFound();
+            return Ok(enrollment);
+        }
 
-    [HttpPost("{courseId}/start")]
-    public async Task<IActionResult> StartCourse(int courseId, [FromQuery] int userId)
-    {
-        var success = await _service.StartCourseAsync(courseId, userId);
-        return success ? Ok() : BadRequest("Cannot start course.");
-    }
+        [HttpPost("guest/create-enrollment")]
+        public async Task<IActionResult> Create([FromBody] CreateEnrollmentDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-    [HttpPost("{courseId}/complete")]
-    public async Task<IActionResult> CompleteCourse(int courseId, [FromQuery] int userId)
-    {
-        var success = await _service.CompleteCourseAsync(courseId, userId);
-        return success ? Ok() : BadRequest("Cannot complete course.");
+            var created = await _enrollmentService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = created.EnrollmentId }, created);
+        }
+
+        // PUT: api/enrollments/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateEnrollmentDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                await _enrollmentService.UpdateAsync(id, dto);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+        }
+
+        // DELETE: api/enrollments/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var deleted = await _enrollmentService.DeleteAsync(id);
+            if (!deleted)
+                return NotFound();
+            return NoContent();
+        }
+
+
+        // POST: api/enrollments/start
+        [HttpPost("user/start-course")]
+        public async Task<IActionResult> StartCourse([FromQuery] int courseId, [FromQuery] int userId)
+        {
+            var enrollment = await _enrollmentService.StartCourseAsync(courseId, userId);
+            return Ok(enrollment);
+        }
+
+        // POST: api/enrollments/complete/{enrollmentId}
+        [HttpPost("user/complete/{enrollmentId}")]
+        public async Task<IActionResult> CompleteEnrollment(int enrollmentId)
+        {
+            try
+            {
+                await _enrollmentService.CompleteEnrollmentAsync(enrollmentId);
+                return Ok("Enrollment marked as completed and certificate issued.");
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+        }
+
+        // POST: api/enrollments/complete-course
+        [HttpPost("user/complete-course")]
+        public async Task<IActionResult> CompleteCourse([FromQuery] int courseId, [FromQuery] int userId)
+        {
+            var success = await _enrollmentService.CompleteCourseAsync(courseId, userId);
+            if (!success)
+                return NotFound();
+
+            return Ok("Course completed and certificate issued.");
+        }
     }
 }

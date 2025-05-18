@@ -15,17 +15,18 @@ public class AnswerOptionsController : ControllerBase
     public async Task<IActionResult> GetAll() => Ok(await _service.GetAllAsync());
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var d = await _service.GetByIdAsync(id);
-        return d == null ? NotFound() : Ok(d);
+        var opt = await _service.GetByIdAsync(id);
+        if (opt == null) return NotFound();
+        return Ok(opt);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateAnswerOptionDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateAnswerOptionDto dto)
     {
-        var c = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = c.Id }, c);
+        var created = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.OptionId }, created);
     }
 
     [HttpPut("{id}")]

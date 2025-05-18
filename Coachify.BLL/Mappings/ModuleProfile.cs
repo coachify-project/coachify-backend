@@ -8,7 +8,7 @@ namespace Coachify.BLL.Mappings
     {
         public ModuleProfile()
         {
-            CreateMap<Module, ModuleDto>().ReverseMap();
+            CreateMap<Module, ModuleDto>();
             CreateMap<Module, CreateModuleDto>().ReverseMap();
             CreateMap<Module, UpdateModuleDto>().ReverseMap();
         }

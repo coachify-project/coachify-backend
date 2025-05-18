@@ -35,7 +35,45 @@ public class LessonsController : ControllerBase
         await _service.UpdateAsync(id, dto);
         return NoContent();
     }
+    
+    // LessonsController.cs
+    [HttpPost("start/{userId}/{lessonId}")]
+    public async Task<ActionResult> StartLesson(int userId, int lessonId)
+    {
+        try
+        {
+            var result = await _service.StartLessonAsync(userId, lessonId);
+            return Ok(new { success = result });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Произошла ошибка при начале прохождения урока");
+        }
+    }
+
+    [HttpPost("complete/{userId}/{lessonId}")]
+    public async Task<ActionResult> CompleteLesson(int userId, int lessonId)
+    {
+        try
+        {
+            var result = await _service.CompleteLessonAsync(userId, lessonId);
+            return Ok(new { success = result });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Произошла ошибка при завершении урока");
+        }
+    }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id) => Ok(await _service.DeleteAsync(id));
 }
+

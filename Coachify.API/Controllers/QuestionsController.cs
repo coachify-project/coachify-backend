@@ -15,17 +15,18 @@ public class QuestionsController : ControllerBase
     public async Task<IActionResult> GetAll() => Ok(await _service.GetAllAsync());
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var d = await _service.GetByIdAsync(id);
-        return d == null ? NotFound() : Ok(d);
+        var q = await _service.GetByIdAsync(id);
+        if (q == null) return NotFound();
+        return Ok(q);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateQuestionDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateQuestionDto dto)
     {
-        var c = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = c.QuestionId }, c);
+        var created = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.QuestionId }, created);
     }
 
     [HttpPut("{id}")]

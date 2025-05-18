@@ -2,7 +2,13 @@
 
 public class EnrollmentDto
 {
-    public int Id { get; set; }
-    public string UserId { get; set; }
+    public int EnrollmentId { get; set; }
+    public int UserId { get; set; }
     public int CourseId { get; set; }
+    public int StatusId { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+
+    public string? CourseTitle { get; set; }
+    public DateTime EnrolledAt { get; set; }
 }

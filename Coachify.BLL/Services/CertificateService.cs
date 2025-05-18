@@ -4,51 +4,107 @@ using Coachify.BLL.Interfaces;
 using Coachify.DAL;
 using Coachify.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
+using PdfSharpCore.Drawing;
+using PdfSharpCore.Pdf;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Coachify.BLL.Services;
 
 public class CertificateService : ICertificateService
 {
     private readonly ApplicationDbContext _db;
-    private readonly IMapper _mapper;
+    private readonly string _certificatesFolder;
 
-    public CertificateService(ApplicationDbContext db, IMapper mapper)
+    public CertificateService(ApplicationDbContext db)
     {
         _db = db;
-        _mapper = mapper;
+        _certificatesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "certificates");
+
+        if (!Directory.Exists(_certificatesFolder))
+            Directory.CreateDirectory(_certificatesFolder);
     }
 
-    public async Task<IEnumerable<CertificateDto>> GetAllAsync() =>
-        _mapper.Map<IEnumerable<CertificateDto>>(await _db.Certificates.ToListAsync());
-
-    public async Task<CertificateDto?> GetByIdAsync(int id)
+    public async Task CreateCertificateForEnrollmentAsync(int enrollmentId)
     {
-        var e = await _db.Certificates.FindAsync(id);
-        return e == null ? null : _mapper.Map<CertificateDto>(e);
-    }
+        // Проверяем, есть ли сертификат уже
+        var existingCertificate = await _db.Certificates.FirstOrDefaultAsync(c => c.EnrollmentId == enrollmentId);
+        if (existingCertificate != null)
+            return; // Сертификат уже есть, можно по желанию обновлять или игнорировать
 
-    public async Task<CertificateDto> CreateAsync(CreateCertificateDto dto)
-    {
-        var e = _mapper.Map<Certificate>(dto);
-        _db.Certificates.Add(e);
+        var enrollment = await _db.Enrollments
+            .Include(e => e.User)    // предполагается, что есть навигация User
+            .Include(e => e.Course)
+            .FirstOrDefaultAsync(e => e.EnrollmentId == enrollmentId);
+
+        if (enrollment == null)
+            throw new KeyNotFoundException($"Enrollment with id={enrollmentId} not found");
+
+        var certificate = new Certificate
+        {
+            EnrollmentId = enrollmentId,
+            IssueDate = System.DateTime.UtcNow
+        };
+
+        _db.Certificates.Add(certificate);
         await _db.SaveChangesAsync();
-        return _mapper.Map<CertificateDto>(e);
+
+        // Генерируем PDF после сохранения, т.к. нужен certificateId
+        await GenerateCertificatePdfAsync(certificate.CertificateId, enrollment.User.FirstName,enrollment.User.LastName, enrollment.Course.Title, certificate.IssueDate);
     }
 
-    public async Task UpdateAsync(int id, UpdateCertificateDto dto)
+    public async Task<string> GenerateCertificatePdfAsync(int certificateId, string FirstName,string LastName, string courseTitle, System.DateTime issuedAt)
     {
-        var e = await _db.Certificates.FindAsync(id);
-        if (e == null) return;
-        _mapper.Map(dto, e);
-        await _db.SaveChangesAsync();
+        string fileName = $"certificate_{certificateId}.pdf";
+        string filePath = Path.Combine(_certificatesFolder, fileName);
+
+        using (var document = new PdfDocument())
+        {
+            var page = document.AddPage();
+            var gfx = XGraphics.FromPdfPage(page);
+
+            var titleFont = new XFont("Verdana", 24, XFontStyle.Bold);
+            var subtitleFont = new XFont("Verdana", 16, XFontStyle.Regular);
+            var textFont = new XFont("Verdana", 14, XFontStyle.Regular);
+
+            gfx.DrawString("Certificate of Completion", titleFont, XBrushes.Black,
+                new XRect(0, 80, page.Width, 40), XStringFormats.Center);
+
+            gfx.DrawString($"This certifies that", subtitleFont, XBrushes.Black,
+                new XRect(0, 140, page.Width, 30), XStringFormats.Center);
+
+            gfx.DrawString(FirstName, new XFont("Verdana", 20, XFontStyle.Bold), XBrushes.Black,
+                new XRect(0, 170, page.Width, 40), XStringFormats.Center);
+            
+            gfx.DrawString(LastName, new XFont("Verdana", 20, XFontStyle.Bold), XBrushes.Black,
+                new XRect(0, 170, page.Width, 40), XStringFormats.Center);
+
+            gfx.DrawString($"has successfully completed the course", subtitleFont, XBrushes.Black,
+                new XRect(0, 220, page.Width, 30), XStringFormats.Center);
+
+            gfx.DrawString(courseTitle, new XFont("Verdana", 18, XFontStyle.BoldItalic), XBrushes.Black,
+                new XRect(0, 250, page.Width, 40), XStringFormats.Center);
+
+            gfx.DrawString($"Date: {issuedAt:dd MMMM yyyy}", textFont, XBrushes.Black,
+                new XRect(0, 310, page.Width, 30), XStringFormats.Center);
+
+            gfx.DrawString($"Certificate ID: {certificateId}", textFont, XBrushes.Black,
+                new XRect(0, 340, page.Width, 30), XStringFormats.Center);
+
+            document.Save(filePath);
+        }
+
+        return $"/certificates/{fileName}";
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<byte[]> GetCertificatePdfAsync(int certificateId)
     {
-        var e = await _db.Certificates.FindAsync(id);
-        if (e == null) return false;
-        _db.Certificates.Remove(e);
-        await _db.SaveChangesAsync();
-        return true;
+        string fileName = $"certificate_{certificateId}.pdf";
+        string filePath = Path.Combine(_certificatesFolder, fileName);
+
+        if (!File.Exists(filePath))
+            return null;
+
+        return await File.ReadAllBytesAsync(filePath);
     }
 }

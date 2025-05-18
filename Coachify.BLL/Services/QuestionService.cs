@@ -18,13 +18,24 @@ public class QuestionService : IQuestionService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<QuestionDto>> GetAllAsync() =>
-        _mapper.Map<IEnumerable<QuestionDto>>(await _db.Questions.ToListAsync());
+    public async Task<IEnumerable<QuestionDto>> GetAllAsync()
+    {
+        var questions = await _db.Questions
+            .Include(q => q.Options)               
+            .ToListAsync();
+
+        return _mapper.Map<IEnumerable<QuestionDto>>(questions);
+    }
 
     public async Task<QuestionDto?> GetByIdAsync(int id)
     {
-        var e = await _db.Questions.FindAsync(id);
-        return e == null ? null : _mapper.Map<QuestionDto>(e);
+        var question = await _db.Questions
+            .Include(q => q.Options)               
+            .FirstOrDefaultAsync(q => q.QuestionId == id);
+
+        return question == null
+            ? null
+            : _mapper.Map<QuestionDto>(question);
     }
 
     public async Task<QuestionDto> CreateAsync(CreateQuestionDto dto)

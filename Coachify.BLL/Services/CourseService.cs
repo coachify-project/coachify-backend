@@ -18,14 +18,83 @@ public class CourseService : ICourseService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<CourseDto>> GetAllAsync() =>
-        _mapper.Map<IEnumerable<CourseDto>>(await _db.Courses.ToListAsync());
+    public async Task<IEnumerable<CourseDto>> GetAllAsync()
+    {
+        var courses = await _db.Courses
+            .Include(c => c.Modules)           
+            .ToListAsync();
+
+        return _mapper.Map<IEnumerable<CourseDto>>(courses);
+    }
 
     public async Task<CourseDto?> GetByIdAsync(int id)
     {
-        var e = await _db.Courses.FindAsync(id);
-        return e == null ? null : _mapper.Map<CourseDto>(e);
+        var course = await _db.Courses
+            .Include(c => c.Modules)           
+            .FirstOrDefaultAsync(c => c.CourseId == id);
+
+        return course == null ? null 
+            : _mapper.Map<CourseDto>(course);
     }
+    
+    public async Task<IEnumerable<CourseDto>> GetCoursesForAdminReviewAsync()
+    {
+        var courses = await _db.Courses
+            .OrderBy(c => c.StatusId == 2 ? 0   // Pending → позиция 0
+                : c.StatusId == 3 ? 1   // Published → 1
+                : c.StatusId == 4 ? 2   // Rejected  → 2
+                : 3)                    // остальные → 3
+            .ThenBy(c => c.Title)                // вторичная сортировка по названию
+            .ToListAsync();
+
+        return _mapper.Map<IEnumerable<CourseDto>>(courses);
+    }
+
+    
+    public async Task<IEnumerable<CourseDto>> GetCoursesByRoleIdAsync(int roleId)
+    {
+        IQueryable<Course> query = _db.Courses;
+
+        if (roleId == 2 || roleId == 3) // User или Coach
+        {
+            query = query.Where(c => c.StatusId == 3); // Только опубликованные
+        }
+        else if (roleId == 1) // Admin
+        {
+            query = query.Where(c => c.StatusId == 2 || c.StatusId == 3); // Pending + Published
+        }
+
+        var courses = await query.ToListAsync();
+        return _mapper.Map<IEnumerable<CourseDto>>(courses);
+    }
+
+    public async Task<IEnumerable<CourseDto>> GetCoachCoursesAsync(int  coachId)
+    {
+        var courses = await _db.Courses
+            .Where(c => c.CoachId == coachId) // важно: CoachId — это Id создателя курса
+            .ToListAsync();
+
+        return _mapper.Map<IEnumerable<CourseDto>>(courses);
+    }
+
+    public async Task<IEnumerable<UserCourseDto>> GetCoursesByUserAsync(int userId)
+    {
+        var list = await _db.Enrollments
+            .Where(e => e.UserId == userId)
+            .Include(e => e.Course)
+            .Select(e => new UserCourseDto
+            {
+                CourseId          = e.Course.CourseId,
+                Title             = e.Course.Title,
+                CoachId           = e.Course.CoachId,
+                CategoryId        = e.Course.CategoryId,
+                EnrollmentStatusId= e.StatusId
+            })
+            .ToListAsync();
+
+        return list;
+    }
+
 
     public async Task<CourseDto> CreateAsync(CreateCourseDto dto)
     {
@@ -49,17 +118,27 @@ public class CourseService : ICourseService
 
     public async Task UpdateAsync(int id, UpdateCourseDto dto)
     {
-        var e = await _db.Courses.FindAsync(id);
-        if (e == null) return;
-        _mapper.Map(dto, e);
+        var course = await _db.Courses.FindAsync(id);
+        if (course == null)
+            throw new KeyNotFoundException($"Course {id} not found");
+
+        // Только Draft или Rejected
+        if (course.StatusId != 1 && course.StatusId != 4)
+            throw new InvalidOperationException("Редактировать можно только черновик или отклонённый курс.");
+
+        _mapper.Map(dto, course);
         await _db.SaveChangesAsync();
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var e = await _db.Courses.FindAsync(id);
-        if (e == null) return false;
-        _db.Courses.Remove(e);
+        var course = await _db.Courses.FindAsync(id);
+        if (course == null) return false;
+
+        if (course.StatusId != 1 && course.StatusId != 4)
+            throw new InvalidOperationException("Удалить можно только черновик или отклонённый курс.");
+
+        _db.Courses.Remove(course);
         await _db.SaveChangesAsync();
         return true;
     }

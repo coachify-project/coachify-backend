@@ -15,7 +15,8 @@ public class Enrollment
     
     public int StatusId { get; set; }
     public EnrollmentStatus Status { get; set; } = null!;
-
+    
+    public DateTime? CompletedAt { get; set; }
 
     public DateTime EnrolledAt { get; set; }
     public int ProgressPercentage { get; set; }
