@@ -10,8 +10,8 @@ public class Course
     [Required, MaxLength(255)] public string Title { get; set; } = null!;
     [MaxLength(255)] public string? Description { get; set; }
     
-    public double? Price { get; set; }
-    public int? MaxClients { get; set; }
+    public double Price { get; set; }
+    public int MaxClients { get; set; }
     public int? Rating { get; set; }
 
     public int CoachId { get; set; }

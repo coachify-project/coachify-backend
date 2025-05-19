@@ -98,25 +98,55 @@ public class CourseService : ICourseService
 
     public async Task<CourseDto> CreateAsync(CreateCourseDto dto)
     {
-        var course = _mapper.Map<Course>(dto);
+        //var course = _mapper.Map<Course>(dto);
 
-        // Находим статус Draft
+        var category = await _db.Categories
+            .FirstOrDefaultAsync(c => c.Name.ToLower() == dto.CategoryName.ToLower());
+
+        if (category == null)
+        {
+            category = new Category { Name = dto.CategoryName };
+            _db.Categories.Add(category);
+            await _db.SaveChangesAsync();
+        }
+
         var draftStatus = await _db.CourseStatuses
-            .FirstOrDefaultAsync(s => s.Name == "Draft"); // имя зависит от того, как ты назвал
+            .FirstOrDefaultAsync(s => s.StatusId == 1); 
 
         if (draftStatus == null)
             throw new Exception("Draft status not found in database");
 
-        course.StatusId = draftStatus.StatusId;
+        var course = new Course
+        {
+            Title = dto.Title,
+            Description = dto.Description,
+            Price = dto.Price,
+            MaxClients = dto.MaxClients,
+            CategoryId = category.CategoryId,
+            CoachId = dto.CoachId,
+            StatusId = draftStatus.StatusId
+        };
+        
+        //course.StatusId = draftStatus.StatusId;
 
         _db.Courses.Add(course);
         await _db.SaveChangesAsync();
 
-        return _mapper.Map<CourseDto>(course);
+        //return _mapper.Map<CourseDto>(course);
+        return new CourseDto
+        {
+            CourseId = course.CourseId,
+            Title = course.Title,
+            Description = course.Description,
+            Price = course.Price,
+            MaxClients = course.MaxClients,
+            CategoryId = course.CategoryId,
+            CoachId = course.CoachId,
+        };
     }
 
 
-    public async Task UpdateAsync(int id, UpdateCourseDto dto)
+    public async Task<CourseDto> UpdateAsync(int id, UpdateCourseDto dto)
     {
         var course = await _db.Courses.FindAsync(id);
         if (course == null)
@@ -126,8 +156,35 @@ public class CourseService : ICourseService
         if (course.StatusId != 1 && course.StatusId != 4)
             throw new InvalidOperationException("Редактировать можно только черновик или отклонённый курс.");
 
-        _mapper.Map(dto, course);
+        var category = await _db.Categories
+            .FirstOrDefaultAsync(c => c.Name.ToLower() == dto.CategoryName.ToLower());
+
+        if (category == null)
+        {
+            category = new Category { Name = dto.CategoryName };
+            _db.Categories.Add(category);
+            await _db.SaveChangesAsync();
+        }
+        
+        course.Title = dto.Title;
+        course.Description = dto.Description;
+        course.Price = dto.Price;
+        course.MaxClients = dto.MaxClients;
+        course.CategoryId = category.CategoryId;
+        
+        //_mapper.Map(dto, course);
         await _db.SaveChangesAsync();
+
+        return new CourseDto
+        {
+            CourseId = course.CourseId,
+            Title = course.Title,
+            Description = course.Description,
+            Price = course.Price,
+            MaxClients = course.MaxClients,
+            CategoryId = course.CategoryId,
+            CoachId = course.CoachId,
+        };
     }
 
     public async Task<bool> DeleteAsync(int id)
