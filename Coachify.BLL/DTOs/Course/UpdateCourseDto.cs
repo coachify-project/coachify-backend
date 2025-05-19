@@ -1,4 +1,6 @@
-﻿namespace Coachify.BLL.DTOs.Course;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Coachify.BLL.DTOs.Course;
 
 public class UpdateCourseDto
 {
@@ -7,5 +9,8 @@ public class UpdateCourseDto
     public double Price { get; set; }
     public int MaxClients { get; set; } 
     public string CategoryName{ get; set; }
+    
+    [Url]
+    public string? PosterUrl { get; set; }
 
 }

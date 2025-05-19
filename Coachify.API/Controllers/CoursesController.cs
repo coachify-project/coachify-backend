@@ -56,6 +56,9 @@ public class CoursesController : ControllerBase
     [HttpPost("coach/create-course")]
     public async Task<IActionResult> Create(CreateCourseDto dto)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
         var c = await _service.CreateAsync(dto);
         return CreatedAtAction(nameof(Get), new { id = c.CourseId }, c);
     }
@@ -63,6 +66,9 @@ public class CoursesController : ControllerBase
     [HttpPut("coach/update-course/{id}")]
     public async Task<IActionResult> Update(int id, UpdateCourseDto dto)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
         await _service.UpdateAsync(id, dto);
         return NoContent();
     }

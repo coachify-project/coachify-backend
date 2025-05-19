@@ -123,6 +123,7 @@ public class CourseService : ICourseService
             Price = dto.Price,
             MaxClients = dto.MaxClients,
             CategoryId = category.CategoryId,
+            PosterUrl = dto.PosterUrl,
             CoachId = dto.CoachId,
             StatusId = draftStatus.StatusId
         };
@@ -140,6 +141,7 @@ public class CourseService : ICourseService
             Description = course.Description,
             Price = course.Price,
             MaxClients = course.MaxClients,
+            PosterUrl = course.PosterUrl,
             CategoryId = course.CategoryId,
             CoachId = course.CoachId,
         };
@@ -171,6 +173,7 @@ public class CourseService : ICourseService
         course.Price = dto.Price;
         course.MaxClients = dto.MaxClients;
         course.CategoryId = category.CategoryId;
+        course.PosterUrl = dto.PosterUrl;
         
         //_mapper.Map(dto, course);
         await _db.SaveChangesAsync();
@@ -182,6 +185,7 @@ public class CourseService : ICourseService
             Description = course.Description,
             Price = course.Price,
             MaxClients = course.MaxClients,
+            PosterUrl = course.PosterUrl,           
             CategoryId = course.CategoryId,
             CoachId = course.CoachId,
         };
