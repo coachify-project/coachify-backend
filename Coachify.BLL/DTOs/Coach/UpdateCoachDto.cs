@@ -1,8 +1,13 @@
-﻿namespace Coachify.BLL.DTOs.Coach;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Coachify.BLL.DTOs.Coach;
 
 public class UpdateCoachDto
 {
-    public int CoachId { get; set; }
-    public int UserId { get; set; }
+   
     public string Bio { get; set; }
+    public object Specialization { get; set; }
+
+    [Url]
+    public string AvatarUrl { get; set; }
 }
