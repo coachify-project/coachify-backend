@@ -67,8 +67,31 @@ builder.Services
     });
 
 // ==== 5. Register BLL services ====
-// Добавлена регистрация IUserService -> UserService
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICoachService, CoachService>();
+builder.Services.AddScoped<ICoachApplicationService, CoachApplicationService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<ICourseStatusService, CourseStatusService>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IEnrollmentStatusService, EnrollmentStatusService>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddScoped<IFeedbackStatusService, FeedbackStatusService>();
+builder.Services.AddScoped<ILessonService, LessonService>();
+builder.Services.AddScoped<ILessonStatusService, LessonStatusService>();
+builder.Services.AddScoped<IModuleService, ModuleService>();
+builder.Services.AddScoped<IModuleStatusService, ModuleStatusService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymentStatusService, PaymentStatusService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<IAnswerOptionService, AnswerOptionService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<ITestService, TestService>();
+builder.Services.AddScoped<ITestSubmissionService, TestSubmissionService>();
+builder.Services.AddScoped<ITestSubmissionAnswerService, TestSubmissionAnswerService>();
+builder.Services.AddScoped<ICertificateService, CertificateService>();
+builder.Services.AddScoped<IUserCoachApplicationStatusService, UserCoachApplicationStatusService>();
+
 
 // ==== 6. Add Controllers, CORS & Swagger ====
 builder.Services.AddControllers();
