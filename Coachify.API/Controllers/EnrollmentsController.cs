@@ -33,7 +33,7 @@ namespace Coachify.API.Controllers
             return Ok(enrollment);
         }
 
-        [HttpPost("guest/create-enrollment")]
+        [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateEnrollmentDto dto)
         {
             if (!ModelState.IsValid)

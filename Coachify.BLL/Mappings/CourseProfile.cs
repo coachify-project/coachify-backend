@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Coachify.BLL.DTOs.Course;
+using Coachify.BLL.DTOs.Module;
 using Coachify.DAL.Entities;
 
 namespace Coachify.BLL.Mappings
@@ -13,6 +14,7 @@ namespace Coachify.BLL.Mappings
                     opt => opt.MapFrom(src => src.Modules));
             CreateMap<CreateCourseDto, Course>(); 
             CreateMap<Course, UpdateCourseDto>().ReverseMap();
+            CreateMap<Module, ModuleDto>(); 
         }
     }
 }

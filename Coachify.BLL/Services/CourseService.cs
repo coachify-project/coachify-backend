@@ -30,11 +30,16 @@ public class CourseService : ICourseService
     public async Task<CourseDto?> GetByIdAsync(int id)
     {
         var course = await _db.Courses
-            .Include(c => c.Modules)           
+            .Include(c => c.Modules)
+            .Include(c => c.Category)
+            .Include(c => c.Coach)
             .FirstOrDefaultAsync(c => c.CourseId == id);
 
-        return course == null ? null 
-            : _mapper.Map<CourseDto>(course);
+        if (course == null)
+            return null;
+
+        var courseDto = _mapper.Map<CourseDto>(course);
+        return courseDto;
     }
     
     public async Task<IEnumerable<CourseDto>> GetCoursesForAdminReviewAsync()
