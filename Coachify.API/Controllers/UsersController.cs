@@ -116,16 +116,16 @@ namespace Coachify.API.Controllers
             return deleted ? NoContent() : NotFound();
         }
 
-        [Authorize]
-        [HttpGet("profile")]
-        public async Task<IActionResult> Profile()
-        {
-            var userIdClaim = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
-                return Unauthorized("Пользователь не авторизован.");
-
-            var user = await _service.GetByIdAsync(userId);
-            return Ok(user);
-        }
+        // [Authorize]
+        // [HttpGet("profile")]
+        // public async Task<IActionResult> Profile()
+        // {
+        //     var userIdClaim = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+        //     if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+        //         return Unauthorized("Пользователь не авторизован.");
+        //
+        //     var user = await _service.GetByIdAsync(userId);
+        //     return Ok(user);
+        // }
     }
 }
