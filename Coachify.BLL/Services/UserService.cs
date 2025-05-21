@@ -112,10 +112,27 @@ namespace Coachify.BLL.Services
 
             user.FirstName = dto.FirstName;
             user.LastName = dto.LastName;
-            // обновление email и пароля по желанию, здесь не делаем
+            user.Email = dto.Email;
+
+            if (!string.IsNullOrWhiteSpace(dto.CurrentPassword) && !string.IsNullOrWhiteSpace(dto.NewPassword))
+            {
+                using var hmac = new HMACSHA512(user.PasswordSalt);
+                var currentHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.CurrentPassword));
+
+                for (int i = 0; i < currentHash.Length; i++)
+                {
+                    if (currentHash[i] != user.PasswordHash[i])
+                        throw new UnauthorizedAccessException("Incorrect current password");
+                }
+
+                using var newHmac = new HMACSHA512();
+                user.PasswordSalt = newHmac.Key;
+                user.PasswordHash = newHmac.ComputeHash(Encoding.UTF8.GetBytes(dto.NewPassword));
+            }
 
             await _context.SaveChangesAsync();
         }
+
 
         public async Task<bool> DeleteAsync(int id)
         {
