@@ -2,5 +2,5 @@
 
 public class UpdateEnrollmentDto
 {
-    public DateTime EnrolledAt { get; set; }
+    public int StatusId { get; set; }
 }

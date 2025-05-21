@@ -1,9 +1,11 @@
-﻿namespace Coachify.BLL.DTOs.UserCoachApplicationStatus;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Coachify.BLL.DTOs.UserCoachApplicationStatus;
 
 public class CreateUserCoachApplicationStatusDto
 {
-    public int UserId { get; set; }
-    public int CoachId { get; set; }
-    public string Status { get; set; } = string.Empty;
-    public DateTime ApplicationDate { get; set; }
+    [Required]
+    public int StatusId { get; } 
+    [Required]
+    public string Name { get; set; }
 }

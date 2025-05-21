@@ -8,9 +8,11 @@ namespace Coachify.BLL.Mappings
     {
         public LessonProfile()
         {
-            CreateMap<Lesson, LessonDto>().ReverseMap();
-            CreateMap<Lesson, CreateLessonDto>().ReverseMap();
-            CreateMap<Lesson, UpdateLessonDto>().ReverseMap();
+            CreateMap<Lesson, LessonDto>()
+                .ForMember(dest => dest.LessonId, opt => opt.MapFrom(src => src.LessonId));
+            CreateMap<CreateLessonDto, Lesson>()
+                .ForMember(dest => dest.LessonId, opt => opt.Ignore());
+            CreateMap<UpdateLessonDto, Lesson>();
         }
     }
 }

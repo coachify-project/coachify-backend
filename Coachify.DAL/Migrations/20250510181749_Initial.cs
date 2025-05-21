@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Coachify.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -125,8 +127,8 @@ namespace Coachify.DAL.Migrations
                     FirstName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     Email = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    PasswordHash = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    PasswordSalt = table.Column<string>(type: "TEXT", nullable: false),
+                    PasswordHash = table.Column<byte[]>(type: "BLOB", maxLength: 255, nullable: false),
+                    PasswordSalt = table.Column<byte[]>(type: "BLOB", nullable: false),
                     RoleId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -148,7 +150,9 @@ namespace Coachify.DAL.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<int>(type: "INTEGER", nullable: false),
                     SubmittedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    StatusId = table.Column<int>(type: "INTEGER", nullable: false)
+                    StatusId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Bio = table.Column<string>(type: "TEXT", nullable: false),
+                    Specialization = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -172,6 +176,7 @@ namespace Coachify.DAL.Migrations
                 columns: table => new
                 {
                     CoachId = table.Column<int>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
                     Bio = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
                     Specialization = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
                     Verified = table.Column<bool>(type: "INTEGER", nullable: false)
@@ -536,6 +541,16 @@ namespace Coachify.DAL.Migrations
                         principalTable: "TestSubmissions",
                         principalColumn: "SubmissionId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "RoleId", "RoleName" },
+                values: new object[,]
+                {
+                    { 1, "Admin" },
+                    { 2, "Client" },
+                    { 3, "Coach" }
                 });
 
             migrationBuilder.CreateIndex(

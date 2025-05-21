@@ -1,10 +1,16 @@
-﻿namespace Coachify.BLL.DTOs.Course;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Coachify.BLL.DTOs.Course;
 
 public class UpdateCourseDto
 {
-    public int Id { get; set; }
-    public string Title { get; set; }
-    public int CoachId { get; set; }
-    public int CategoryId { get; set; }
-    public int StatusId { get; set; }
+    public string Title { get; set; } = null!;
+    public string Description { get; set; } = null!;
+    public double Price { get; set; }
+    public int MaxClients { get; set; } 
+    public string CategoryName{ get; set; }
+    
+    [Url]
+    public string? PosterUrl { get; set; }
+
 }

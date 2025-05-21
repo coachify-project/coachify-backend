@@ -2,7 +2,8 @@
 {
     public class UpdateCoachApplicationDto
     {
-        public string? MotivationText { get; set; }
+        public string? Bio { get; set; }
         public int? StatusId { get; set; }
+        public string? Specialization { get; set; }
     }
 }

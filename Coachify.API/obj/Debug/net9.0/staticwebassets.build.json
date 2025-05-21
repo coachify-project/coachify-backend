@@ -1,12 +1,20 @@
 {
   "Version": 1,
-  "Hash": "Ksx99j+OpWjAGLva4NHkNlIAFHOkF3O/Be7m69Z4WUc=",
+  "Hash": "aqwCyRGQHrmCWlEuCSlmo0tmdwFHB3/zavAbM85Akfw=",
   "Source": "Coachify.API",
   "BasePath": "_content/Coachify.API",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "Coachify.API\\wwwroot",
+      "Source": "Coachify.API",
+      "ContentRoot": "C:\\Users\\Hp\\Programming\\CoachifyProject\\coachify-backend\\Coachify.API\\wwwroot\\",
+      "BasePath": "_content/Coachify.API",
+      "Pattern": "**"
+    }
+  ],
   "Assets": [],
   "Endpoints": []
 }

@@ -2,5 +2,6 @@
 
 public class UpdateTestSubmissionDto
 {
-    public DateTime SubmittedAt { get; set; }
+    public int Score { get; set; }
+    public bool IsPassed { get; set; }
 }

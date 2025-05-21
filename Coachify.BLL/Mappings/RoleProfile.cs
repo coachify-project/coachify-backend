@@ -8,9 +8,20 @@ namespace Coachify.BLL.Mappings
     {
         public RoleProfile()
         {
-            CreateMap<Role, RoleDto>().ReverseMap();
-            CreateMap<Role, CreateRoleDto>().ReverseMap();
-            CreateMap<Role, UpdateRoleDto>().ReverseMap();
+            CreateMap<Role, RoleDto>()
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.RoleName))
+                .ReverseMap()
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.RoleName));
+
+            CreateMap<Role, CreateRoleDto>()
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.RoleName))
+                .ReverseMap()
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.RoleName));
+
+            CreateMap<Role, UpdateRoleDto>()
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.RoleName))
+                .ReverseMap()
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.RoleName));
         }
     }
 }

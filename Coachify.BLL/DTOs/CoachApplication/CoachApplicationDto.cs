@@ -2,9 +2,10 @@
 {
     public class CoachApplicationDto
     {
-        public int Id { get; set; }
+        public int ApplicationId { get; set; }
         public int UserId { get; set; }
-        public string MotivationText { get; set; }
+        public string Bio { get; set; }
+        public string Specialization { get; set; }
         public DateTime CreatedAt { get; set; }
         public int StatusId { get; set; }
     }

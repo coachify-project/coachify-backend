@@ -6,8 +6,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="449f1af0-d746-4473-b77d-5d734f62e807" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Coachify.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Coachify.dir/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/appsettings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net9.0/Coachify.API.dll" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net9.0/Coachify.API.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net9.0/Coachify.API.exe" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net9.0/Coachify.API.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net9.0/Coachify.API.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net9.0/Coachify.API.pdb" afterDir="false" />
@@ -15,65 +15,39 @@
       <change beforePath="$PROJECT_DIR$/bin/Debug/net9.0/Coachify.BLL.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net9.0/Coachify.BLL.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net9.0/Coachify.DAL.dll" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net9.0/Coachify.DAL.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net9.0/Coachify.DAL.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net9.0/Coachify.DAL.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Coachify.API.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Coachify.API.csproj.nuget.dgspec.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.assets.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.csproj.AssemblyReference.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.csproj.CoreCompileInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.dll" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.genruntimeconfig.cache" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.genruntimeconfig.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/Coachify.API.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/apphost.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/ref/Coachify.API.dll" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/ref/Coachify.API.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net9.0/refint/Coachify.API.dll" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net9.0/refint/Coachify.API.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.BLL/Coachify.BLL.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/Coachify.BLL.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Coachify.BLL/Services/QuestionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/Services/QuestionService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.BLL/bin/Debug/net9.0/Coachify.BLL.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/bin/Debug/net9.0/Coachify.BLL.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.BLL/bin/Debug/net9.0/Coachify.BLL.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/bin/Debug/net9.0/Coachify.BLL.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.BLL/bin/Debug/net9.0/Coachify.DAL.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/bin/Debug/net9.0/Coachify.DAL.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.BLL/bin/Debug/net9.0/Coachify.DAL.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/bin/Debug/net9.0/Coachify.DAL.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Coachify.BLL.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Coachify.BLL.csproj.nuget.dgspec.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.assets.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.csproj.AssemblyReference.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.csproj.CoreCompileInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/Coachify.BLL.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/ref/Coachify.BLL.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/ref/Coachify.BLL.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/refint/Coachify.BLL.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/Debug/net9.0/refint/Coachify.BLL.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.BLL/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.BLL/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.DAL/Coachify.DAL.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/Coachify.DAL.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.DAL/bin/Debug/net9.0/Coachify.DAL.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/bin/Debug/net9.0/Coachify.DAL.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.DAL/bin/Debug/net9.0/Coachify.DAL.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/bin/Debug/net9.0/Coachify.DAL.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/Coachify.DAL.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/Coachify.DAL.csproj.nuget.dgspec.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.assets.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/Coachify.DAL.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/ref/Coachify.DAL.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/ref/Coachify.DAL.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/refint/Coachify.DAL.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/Debug/net9.0/refint/Coachify.DAL.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Coachify.DAL/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/../Coachify.DAL/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,21 +57,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "annaZakharchenko"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;annaZakharchenko&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/coachify-project/coachify-backend.git",
-    "accountId": "df11391c-a6a3-4f20-adfa-bfcfd1230276"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/coachify-project/coachify-backend.git&quot;,
+    &quot;accountId&quot;: &quot;df11391c-a6a3-4f20-adfa-bfcfd1230276&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="2wElmYyhmAEEYwr0LBQ5dCxPdrv" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -108,7 +82,7 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "MigrationsIssueSolving",
+    "git-widget-placeholder": "ControllersCreation",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   }
@@ -153,6 +127,7 @@
       <option name="presentableId" value="Default" />
       <updated>1745614773594</updated>
       <workItem from="1745614774755" duration="18000" />
+      <workItem from="1746537486057" duration="7000" />
     </task>
     <servers />
   </component>

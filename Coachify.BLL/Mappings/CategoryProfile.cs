@@ -8,9 +8,12 @@ namespace Coachify.BLL.Mappings
     {
         public CategoryProfile()
         {
-            CreateMap<Category, CategoryDto>().ReverseMap();
-            CreateMap<Category, CreateCategoryDto>().ReverseMap();
-            CreateMap<Category, UpdateCategoryDto>().ReverseMap();
-        }
+            CreateMap<Category, CategoryDto>()
+                .ForMember(dest => dest.Id,
+                    opt => opt.MapFrom(src => src.CategoryId));
+
+            // Для создания и обновления
+            CreateMap<CreateCategoryDto, Category>();
+            CreateMap<UpdateCategoryDto, Category>(); }
     }
 }
