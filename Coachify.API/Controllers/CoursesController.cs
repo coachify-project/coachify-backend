@@ -51,6 +51,14 @@ public class CoursesController : ControllerBase
         var courses = await _service.GetCoachCoursesAsync(coachId);
         return Ok(courses);
     }
+    
+    [HttpGet("coach/{coachId}/published-courses")]
+    public async Task<IActionResult> GetPublishedCoursesByCoach(int coachId)
+    {
+        var courses = await _service.GetPublishedCoursesByCoachIdAsync(coachId);
+        return Ok(courses);
+    }
+
 
 
     [HttpPost("coach/create-course")]

@@ -81,6 +81,16 @@ public class CourseService : ICourseService
 
         return _mapper.Map<IEnumerable<CourseDto>>(courses);
     }
+    
+    public async Task<IEnumerable<CourseDto>> GetPublishedCoursesByCoachIdAsync(int coachId)
+    {
+        var courses = await _db.Courses
+            .Where(c => c.CoachId == coachId && c.StatusId == 3) // только опубликованные
+            .ToListAsync();
+
+        return _mapper.Map<IEnumerable<CourseDto>>(courses);
+    }
+
 
     public async Task<IEnumerable<UserCourseDto>> GetCoursesByUserAsync(int userId)
     {
