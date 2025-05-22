@@ -7,7 +7,7 @@ public class CourseStatus
     [Key]
     public int StatusId { get; set; }
 
-    [Required, MaxLength(255)] public string Name { get; set; } = null!;// Draft, PendingApproval, Published, Blocked, In progress, Completed, Not Started
+    [Required, MaxLength(255)] public string Name { get; set; } = null!;// Draft, PendingApproval, Published, Blocked
 
     public ICollection<Course> Courses { get; set; } = new List<Course>();
 }

@@ -45,29 +45,29 @@ public class CourseService : ICourseService
     public async Task<IEnumerable<CourseDto>> GetCoursesForAdminReviewAsync()
     {
         var courses = await _db.Courses
-            .OrderBy(c => c.StatusId == 2 ? 0   // Pending → позиция 0
-                : c.StatusId == 3 ? 1   // Published → 1
-                : c.StatusId == 4 ? 2   // Rejected  → 2
-                : 3)                    // остальные → 3
-            .ThenBy(c => c.Title)                // вторичная сортировка по названию
+            .Where(c => c.StatusId == 2 || c.StatusId == 3 || c.StatusId == 4) // фильтрация
+            .OrderBy(c => c.StatusId == 2 ? 0   // Pending → 0
+                : c.StatusId == 3 ? 1           // Published → 1
+                : 2)                            // Rejected → 2
+            .ThenBy(c => c.Title)              // вторичная сортировка по названию
             .ToListAsync();
 
         return _mapper.Map<IEnumerable<CourseDto>>(courses);
     }
+
 
     
     public async Task<IEnumerable<CourseDto>> GetCoursesByRoleIdAsync(int roleId)
     {
         IQueryable<Course> query = _db.Courses;
 
-        if (roleId == 2 || roleId == 3) // User или Coach
+        query = roleId switch
         {
-            query = query.Where(c => c.StatusId == 3); // Только опубликованные
-        }
-        else if (roleId == 1) // Admin
-        {
-            query = query.Where(c => c.StatusId == 2 || c.StatusId == 3); // Pending + Published
-        }
+            1 => query.Where(c => c.StatusId == 2 || c.StatusId == 3), // Admin
+            2 or 3 => query.Where(c => c.StatusId == 3), // User/Coach
+            _ => query.Where(c => false) // No access
+        };
+
 
         var courses = await query.ToListAsync();
         return _mapper.Map<IEnumerable<CourseDto>>(courses);
@@ -168,7 +168,7 @@ public class CourseService : ICourseService
         var course = await _db.Courses.FindAsync(id);
         if (course == null)
             throw new KeyNotFoundException($"Course {id} not found");
-
+        
         // Только Draft или Rejected
         if (course.StatusId != 1 && course.StatusId != 4)
             throw new InvalidOperationException("Редактировать можно только черновик или отклонённый курс.");
@@ -190,7 +190,6 @@ public class CourseService : ICourseService
         course.CategoryId = category.CategoryId;
         course.PosterUrl = dto.PosterUrl;
         
-        //_mapper.Map(dto, course);
         await _db.SaveChangesAsync();
 
         return new CourseDto
@@ -227,6 +226,8 @@ public class CourseService : ICourseService
             return false;
 
         course.StatusId = 2; //pending
+        course.SubmittedAt = DateTime.UtcNow; 
+        
         await _db.SaveChangesAsync();
         return true;
     }
@@ -272,10 +273,10 @@ public class CourseService : ICourseService
         var enrollment = await _db.Enrollments
             .FirstOrDefaultAsync(e => e.CourseId == courseId && e.UserId == userId);
 
-        if (enrollment == null || enrollment.StatusId != 6) // In progress
+        if (enrollment == null || enrollment.StatusId != 2) // In progress
             return false;
 
-        enrollment.StatusId = 7; // Completed
+        enrollment.StatusId = 3; // Completed
         await _db.SaveChangesAsync();
         return true;
     }
