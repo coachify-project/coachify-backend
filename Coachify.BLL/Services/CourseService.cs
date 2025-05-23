@@ -33,6 +33,8 @@ public class CourseService : ICourseService
             .Include(c => c.Modules)
             .Include(c => c.Category)
             .Include(c => c.Coach)
+            .Include(c => c.Status)
+            .Include(c => c.Feedbacks)
             .FirstOrDefaultAsync(c => c.CourseId == id);
 
         if (course == null)

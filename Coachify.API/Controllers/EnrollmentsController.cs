@@ -39,9 +39,17 @@ namespace Coachify.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var created = await _enrollmentService.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = created.EnrollmentId }, created);
+            try
+            {
+                var created = await _enrollmentService.CreateAsync(dto);
+                return CreatedAtAction(nameof(GetById), new { id = created.EnrollmentId }, created);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
 
         // PUT: api/enrollments/{id}
         [HttpPut("{id}")]

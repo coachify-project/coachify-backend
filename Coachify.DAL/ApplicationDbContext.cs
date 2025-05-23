@@ -128,7 +128,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Feedback>()
             .HasOne(f => f.Client)
             .WithMany(u => u.Feedbacks)
-            .HasForeignKey(f => f.ClientId);
+            .HasForeignKey(f => f.UserId);
 
         // Relationships between TestSubmission, Test, and User (Client)
         modelBuilder.Entity<TestSubmission>()

@@ -34,13 +34,15 @@ public class EnrollmentService : IEnrollmentService
             FirstName = e.User.FirstName,
             LastName = e.User.LastName,
             CourseTitle = e.Course.Title,
-            EnrolledAt = e.EnrolledAt
+            EnrolledAt = e.EnrolledAt,
+            IsEnrolled = e.IsEnrolled
         });
     }
 
     public async Task<EnrollmentDto?> GetByIdAsync(int id)
     {
         var e = await _db.Enrollments
+            .Where(e => e.IsEnrolled)
             .Include(x => x.User)
             .Include(x => x.Course)
             .FirstOrDefaultAsync(x => x.EnrollmentId == id);
@@ -56,7 +58,8 @@ public class EnrollmentService : IEnrollmentService
             FirstName = e.User.FirstName,
             LastName = e.User.LastName,
             CourseTitle = e.Course.Title,
-            EnrolledAt = e.EnrolledAt
+            EnrolledAt = e.EnrolledAt,
+            IsEnrolled = e.IsEnrolled
         };
     }
 
@@ -66,19 +69,27 @@ public class EnrollmentService : IEnrollmentService
         if (course == null || course.StatusId != 3) // Published
             throw new Exception("Курс недоступен для записи");
 
+        // ⛔ Проверка: уже записан?
+        bool alreadyEnrolled = await _db.Enrollments.AnyAsync(e =>
+            e.CourseId == dto.CourseId && e.UserId == dto.UserId);
+        if (alreadyEnrolled)
+            throw new Exception("Пользователь уже записан на этот курс.");
+
         var enrollment = new Enrollment
         {
             UserId = dto.UserId,
             CourseId = dto.CourseId,
             StatusId = 1,
-            EnrolledAt = System.DateTime.UtcNow
+            EnrolledAt = System.DateTime.UtcNow,
+            IsEnrolled = true
         };
 
         _db.Enrollments.Add(enrollment);
         await _db.SaveChangesAsync();
 
-        return await GetByIdAsync(enrollment.EnrollmentId) ?? throw new System.Exception("Ошибка создания записи");
+        return await GetByIdAsync(enrollment.EnrollmentId) ?? throw new Exception("Ошибка создания записи");
     }
+
 
     public async Task UpdateAsync(int id, UpdateEnrollmentDto dto)
     {
@@ -97,7 +108,8 @@ public class EnrollmentService : IEnrollmentService
         var enrollment = await _db.Enrollments.FindAsync(id);
         if (enrollment == null) return false;
 
-        _db.Enrollments.Remove(enrollment);
+        enrollment.IsEnrolled = false;
+        //_db.Enrollments.Remove(enrollment);
         await _db.SaveChangesAsync();
 
         return true;
@@ -131,7 +143,7 @@ public class EnrollmentService : IEnrollmentService
         return true;
     }
 
-    
+
     public async Task<EnrollmentDto> StartCourseAsync(int courseId, int userId)
     {
         var course = await _db.Courses.FindAsync(courseId);
@@ -148,13 +160,15 @@ public class EnrollmentService : IEnrollmentService
                 CourseId = courseId,
                 UserId = userId,
                 StatusId = 2, // In Progress
-                EnrolledAt = System.DateTime.UtcNow
+                EnrolledAt = System.DateTime.UtcNow,
+                IsEnrolled = true
             };
             _db.Enrollments.Add(enrollment);
         }
         else
         {
             enrollment.StatusId = 2; // In Progress
+            enrollment.IsEnrolled = true;
         }
 
         await _db.SaveChangesAsync();
@@ -164,7 +178,7 @@ public class EnrollmentService : IEnrollmentService
     public async Task CompleteEnrollmentAsync(int enrollmentId)
     {
         var enrollment = await _db.Enrollments.FindAsync(enrollmentId);
-        if (enrollment == null) 
+        if (enrollment == null)
             throw new KeyNotFoundException($"Enrollment with id={enrollmentId} not found");
 
         enrollment.StatusId = 3; // Completed

@@ -8,7 +8,8 @@ public class EnrollmentDto
     public int StatusId { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
-
+    
+    public bool IsEnrolled { get; set; }
     public string? CourseTitle { get; set; }
     public DateTime EnrolledAt { get; set; }
 }
