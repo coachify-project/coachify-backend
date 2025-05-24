@@ -7,4 +7,5 @@ public class CreateModuleDto
     public string Description { get; set; }
 
     public List<string> SkillNames { get; set; } = new();
+    public List<string> Lessons { get; set; } = new();
 }

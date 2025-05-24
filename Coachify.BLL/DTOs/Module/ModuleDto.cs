@@ -1,4 +1,5 @@
-﻿using Coachify.BLL.DTOs.Skill;
+﻿using Coachify.BLL.DTOs.Lesson;
+using Coachify.BLL.DTOs.Skill;
 
 namespace Coachify.BLL.DTOs.Module;
 
@@ -12,4 +13,6 @@ public class ModuleDto
 
 
     public List<SkillDto> Skills { get; set; } = new();
+    public List<LessonDto> Lessons { get; set; } = new();
+
 }

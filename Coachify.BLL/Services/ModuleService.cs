@@ -40,6 +40,7 @@ public class ModuleService : IModuleService
     {
         var module = await _db.Modules
             .Include(m => m.Skills)
+            .Include(m => m.Lessons)
             .FirstOrDefaultAsync(m => m.ModuleId == id);
         return module == null ? null : _mapper.Map<ModuleDto>(module);
     }
