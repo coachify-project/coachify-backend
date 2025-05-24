@@ -3,6 +3,7 @@ using System;
 using Coachify.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Coachify.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250524115251_AddProgressEntity")]
+    partial class AddProgressEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.4");
@@ -850,7 +853,7 @@ namespace Coachify.DAL.Migrations
                     b.HasIndex("UserId", "LessonId")
                         .IsUnique();
 
-                    b.ToTable("UserLessonProgresses");
+                    b.ToTable("UserLessonProgress");
                 });
 
             modelBuilder.Entity("Coachify.DAL.Entities.UserModuleProgress", b =>
@@ -880,7 +883,7 @@ namespace Coachify.DAL.Migrations
                     b.HasIndex("UserId", "ModuleId")
                         .IsUnique();
 
-                    b.ToTable("UserModuleProgresses");
+                    b.ToTable("UserModuleProgress");
                 });
 
             modelBuilder.Entity("ModuleSkill", b =>

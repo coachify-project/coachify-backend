@@ -30,6 +30,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<TestSubmissionAnswer> TestSubmissionAnswers { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserCoachApplicationStatus> UserCoachApplicationStatuses { get; set; }
+    public DbSet<UserLessonProgress> UserLessonProgresses { get; set; }
+    public DbSet<UserModuleProgress> UserModuleProgresses { get; set; }
+
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -37,7 +40,7 @@ public class ApplicationDbContext : DbContext
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlite("Data Source=coachify.db");
+        => optionsBuilder.UseSqlite("Data Source=..\\Coachify.DAL\\coachify.db");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -129,6 +132,14 @@ public class ApplicationDbContext : DbContext
             .HasOne(f => f.Client)
             .WithMany(u => u.Feedbacks)
             .HasForeignKey(f => f.UserId);
+        
+        modelBuilder.Entity<UserLessonProgress>()
+            .HasIndex(p => new { p.UserId, p.LessonId })
+            .IsUnique();
+
+        modelBuilder.Entity<UserModuleProgress>()
+            .HasIndex(p => new { p.UserId, p.ModuleId })
+            .IsUnique();
 
         // Relationships between TestSubmission, Test, and User (Client)
         modelBuilder.Entity<TestSubmission>()
@@ -185,6 +196,12 @@ public class ApplicationDbContext : DbContext
             new ModuleStatus { StatusId = 2, StatusName = "Not Started" },
             new ModuleStatus { StatusId = 3, StatusName = "In progress" },
             new ModuleStatus { StatusId = 4, StatusName = "Completed" }
+        );
+        
+        modelBuilder.Entity<ProgressStatus>().HasData(
+            new ProgressStatus { StatusId = 2, Name = "NotStarted" },
+            new ProgressStatus { StatusId = 3, Name = "InProgress" },
+            new ProgressStatus { StatusId = 4, Name = "Completed" }
         );
 
 

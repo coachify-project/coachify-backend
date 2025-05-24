@@ -18,7 +18,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options
       .UseSqlite(
           builder.Configuration.GetConnectionString("DefaultConnection")
-          ?? "Data Source=coachify.db"
       )
       .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
 );
@@ -91,6 +90,8 @@ builder.Services.AddScoped<ITestSubmissionService, TestSubmissionService>();
 builder.Services.AddScoped<ITestSubmissionAnswerService, TestSubmissionAnswerService>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IUserCoachApplicationStatusService, UserCoachApplicationStatusService>();
+builder.Services.AddScoped<IProgressService, ProgressService>();
+
 
 
 // ==== 6. Add Controllers, CORS & Swagger ====
