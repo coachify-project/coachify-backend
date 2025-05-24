@@ -1,79 +1,142 @@
 ﻿using Coachify.BLL.DTOs.Lesson;
 using Coachify.BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
-namespace Coachify.API.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class LessonsController : ControllerBase
+namespace Coachify.API.Controllers
 {
-    private readonly ILessonService _service;
-    public LessonsController(ILessonService service) => _service = service;
-
-    [HttpGet]
-    public async Task<IActionResult> GetAll() => Ok(await _service.GetAllAsync());
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> Get(int id)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class LessonsController : ControllerBase
     {
-        var d = await _service.GetByIdAsync(id);
-        return d == null ? NotFound() : Ok(d);
-    }
+        private readonly ILessonService _service;
 
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateLessonDto dto)
-    {
-        var createdLesson = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = createdLesson.LessonId }, createdLesson);
-    }
+        public LessonsController(ILessonService service)
+        {
+            _service = service;
+        }
 
+        // GET: api/lessons
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var lessons = await _service.GetAllAsync();
+            return Ok(lessons);
+        }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateLessonDto dto)
-    {
-        await _service.UpdateAsync(id, dto);
-        return NoContent();
-    }
-    
-    // LessonsController.cs
-    [HttpPost("start/{userId}/{lessonId}")]
-    public async Task<ActionResult> StartLesson(int userId, int lessonId)
-    {
-        try
+        // GET: api/lessons/5
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
         {
-            var result = await _service.StartLessonAsync(userId, lessonId);
-            return Ok(new { success = result });
+            var lesson = await _service.GetByIdAsync(id);
+            if (lesson == null)
+                return NotFound();
+            return Ok(lesson);
         }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "Произошла ошибка при начале прохождения урока");
-        }
-    }
 
-    [HttpPost("complete/{userId}/{lessonId}")]
-    public async Task<ActionResult> CompleteLesson(int userId, int lessonId)
-    {
-        try
+        // POST: api/lessons
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateLessonDto dto)
         {
-            var result = await _service.CompleteLessonAsync(userId, lessonId);
-            return Ok(new { success = result });
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var createdLesson = await _service.CreateAsync(dto);
+                return CreatedAtAction(nameof(Get), new { id = createdLesson.LessonId }, createdLesson);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
-        catch (ArgumentException ex)
+
+        // PUT: api/lessons/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateLessonDto dto)
         {
-            return BadRequest(ex.Message);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var updatedLesson = await _service.UpdateAsync(id, dto);
+                return Ok(updatedLesson);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
-        catch (Exception)
+
+        // DELETE: api/lessons/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            return StatusCode(500, "Произошла ошибка при завершении урока");
+            try
+            {
+                var deleted = await _service.DeleteAsync(id);
+                if (!deleted)
+                    return NotFound();
+
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // POST: api/lessons/start/10/5
+        [HttpPost("start/{userId}/{lessonId}")]
+        public async Task<IActionResult> StartLesson(int userId, int lessonId)
+        {
+            try
+            {
+                var result = await _service.StartLessonAsync(userId, lessonId);
+                return Ok(new { success = result });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Произошла ошибка при начале прохождения урока" });
+            }
+        }
+
+        // POST: api/lessons/complete/10/5
+        [HttpPost("complete/{userId}/{lessonId}")]
+        public async Task<IActionResult> CompleteLesson(int userId, int lessonId)
+        {
+            try
+            {
+                var result = await _service.CompleteLessonAsync(userId, lessonId);
+                return Ok(new { success = result });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Произошла ошибка при завершении урока" });
+            }
         }
     }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id) => Ok(await _service.DeleteAsync(id));
 }
-

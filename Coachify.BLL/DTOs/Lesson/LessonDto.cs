@@ -1,4 +1,6 @@
-﻿namespace Coachify.BLL.DTOs.Lesson;
+﻿using Coachify.BLL.DTOs.Progress;
+
+namespace Coachify.BLL.DTOs.Lesson;
 
 public class LessonDto
 {
@@ -7,7 +9,5 @@ public class LessonDto
     public string? Introduction { get; set; }
     public string? LessonObjectives { get; set; }
     public string VideoUrl { get; set; }
-    
-    public int ModuleId { get; set; }
-    public int StatusId { get; set; }
+    public ProgressStatusDto Status { get; set; } = null!;
 }

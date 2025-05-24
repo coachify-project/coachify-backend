@@ -7,7 +7,5 @@ public interface ITestSubmissionAnswerService
 {
     Task<IEnumerable<TestSubmissionAnswerDto>> GetAllAsync();
     Task<TestSubmissionAnswerDto?> GetByIdAsync(int id);
-    Task<TestSubmissionAnswerDto> CreateAsync(CreateTestSubmissionAnswerDto dto);
-    Task UpdateAsync(int id, UpdateTestSubmissionAnswerDto dto);
     Task<bool> DeleteAsync(int id);
 }

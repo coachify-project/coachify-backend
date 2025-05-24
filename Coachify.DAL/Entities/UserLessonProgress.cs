@@ -1,4 +1,5 @@
-﻿using System;
+﻿// UserLessonProgress.cs
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Coachify.DAL.Entities
@@ -14,7 +15,8 @@ namespace Coachify.DAL.Entities
         [Required]
         public int LessonId { get; set; }
         public Lesson Lesson { get; set; } = null!;
-        
+
+        [Required]
         public int StatusId { get; set; }
         public ProgressStatus Status { get; set; } = null!;
 

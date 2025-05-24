@@ -17,20 +17,19 @@ public static class AutoMapperConfig
             typeof(CourseProfile).Assembly,
             typeof(CourseStatusProfile).Assembly,
             typeof(EnrollmentProfile).Assembly,
+            typeof(EnrollmentStatusProfile).Assembly,
             typeof(FeedbackProfile).Assembly,
             typeof(FeedbackStatusProfile).Assembly,
             typeof(LessonProfile).Assembly,
-            typeof(LessonStatusProfile).Assembly,
             typeof(ModuleProfile).Assembly,
-            typeof(ModuleStatusProfile).Assembly,
             typeof(PaymentProfile).Assembly,
             typeof(PaymentStatusProfile).Assembly,
             typeof(QuestionProfile).Assembly,
             typeof(RoleProfile).Assembly,
+            typeof(SkillProfile).Assembly,
             typeof(TestProfile).Assembly,
-            typeof(TestSubmissionAnswerProfile).Assembly,
             typeof(TestSubmissionProfile).Assembly,
-            typeof(UserCoachApplicationStatusProfile).Assembly,
+            typeof(TestSubmissionAnswerProfile).Assembly,
             typeof(UserProfile).Assembly
         );
     }

@@ -1,79 +1,209 @@
 ﻿using Coachify.BLL.DTOs.Module;
+using Coachify.BLL.DTOs.Test;
+using Coachify.BLL.DTOs.Progress;
 using Coachify.BLL.Interfaces;
+using Coachify.DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Coachify.API.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class ModulesController : ControllerBase
+namespace Coachify.API.Controllers
 {
-    private readonly IModuleService _service;
-    public ModulesController(IModuleService service) => _service = service;
-
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ModulesController : ControllerBase
     {
-        var list = await _service.GetAllAsync();
-        return Ok(list);
-    }
+        private readonly IModuleService _service;
 
-    [HttpGet("course/{courseId}")]
-    public async Task<IActionResult> GetByCourse(int courseId)
-    {
-        var list = await _service.GetAllByCourseAsync(courseId);
-        return Ok(list);
-    }
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> Get(int id)
-    {
-        var module = await _service.GetByIdAsync(id);
-        return module == null ? NotFound() : Ok(module);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateModuleDto dto)
-    {
-        var created = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = created.ModuleId }, created);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateModuleDto dto)
-    {
-        try
+        public ModulesController(IModuleService service)
         {
-            var updated = await _service.UpdateAsync(id, dto);
-            return Ok(updated);
+            _service = service;
         }
-        catch (KeyNotFoundException)
+
+        // GET: api/modules
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ModuleDto>>> GetAll()
         {
-            return NotFound();
+            var modules = await _service.GetAllAsync();
+            return Ok(modules);
+        }
+
+        // GET: api/modules/course/5
+        [HttpGet("course/{courseId}")]
+        public async Task<ActionResult<IEnumerable<ModuleDto>>> GetByCourse(int courseId)
+        {
+            var modules = await _service.GetAllByCourseAsync(courseId);
+            return Ok(modules);
+        }
+
+        // GET: api/modules/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ModuleDto>> Get(int id)
+        {
+            var module = await _service.GetByIdAsync(id);
+            if (module == null)
+                return NotFound();
+            return Ok(module);
+        }
+
+        // GET: api/modules/5/user/10
+        [HttpGet("{moduleId}/user/{userId}")]
+        public async Task<ActionResult<ModuleDto>> GetByIdForUser(int moduleId, int userId)
+        {
+            var module = await _service.GetByIdForUserAsync(moduleId, userId);
+            if (module == null)
+                return NotFound();
+            return Ok(module);
+        }
+
+        // GET: api/modules/5/user/10/test
+        [HttpGet("{moduleId}/user/{userId}/test")]
+        public async Task<ActionResult<TestDto?>> GetTestByModuleForUser(int userId, int moduleId)
+        {
+            try
+            {
+                var test = await _service.GetTestByModuleForUserAsync(userId, moduleId);
+                return Ok(test);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // POST: api/modules
+        [HttpPost]
+        public async Task<ActionResult<ModuleDto>> Create([FromBody] CreateModuleDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var createdModule = await _service.CreateAsync(dto);
+                return CreatedAtAction(nameof(Get), new { id = createdModule.ModuleId }, createdModule);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // PUT: api/modules/5
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ModuleDto>> Update(int id, [FromBody] UpdateModuleDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var updatedModule = await _service.UpdateAsync(id, dto);
+                return Ok(updatedModule);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // DELETE: api/modules/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            try
+            {
+                var deleted = await _service.DeleteAsync(id);
+                if (!deleted)
+                    return NotFound();
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // POST: api/modules/5/start?userId=10
+        [HttpPost("{moduleId}/start")]
+        public async Task<ActionResult> StartModule(int moduleId, [FromQuery] int userId)
+        {
+            try
+            {
+                var success = await _service.StartModuleAsync(userId, moduleId);
+                return Ok(new { success });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Ошибка при запуске модуля." });
+            }
+        }
+
+        // POST: api/modules/lesson/15/complete?userId=10
+        [HttpPost("lesson/{lessonId}/complete")]
+        public async Task<ActionResult> MarkLessonCompleted(int lessonId, [FromQuery] int userId)
+        {
+            try
+            {
+                var success = await _service.MarkLessonCompletedAsync(userId, lessonId);
+                return Ok(new { success });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // GET: api/modules/5/user/10/progress
+        [HttpGet("{moduleId}/user/{userId}/progress")]
+        public async Task<ActionResult<IEnumerable<UserLessonProgress>>> GetUserLessonProgress(int moduleId, int userId)
+        {
+            try
+            {
+                var progress = await _service.GetUserLessonProgressAsync(userId, moduleId);
+                return Ok(progress);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // POST: api/modules/5/complete?userId=10
+        [HttpPost("{moduleId}/complete")]
+        public async Task<ActionResult> CompleteModule(int moduleId, [FromQuery] int userId)
+        {
+            try
+            {
+                var success = await _service.CompleteModuleAsync(userId, moduleId);
+                return Ok(new { success });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
-
-
-    // ModulesController.cs
-    [HttpPost("{moduleId}/start")]
-    public async Task<ActionResult> StartModule(int moduleId, [FromQuery] int userId)
-    {
-        try
-        {
-            var result = await _service.StartModuleAsync(userId, moduleId);
-            return Ok(new { success = result });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "Произошла ошибка при начале прохождения модуля");
-        }
-    }
-
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id) => Ok(await _service.DeleteAsync(id));
 }

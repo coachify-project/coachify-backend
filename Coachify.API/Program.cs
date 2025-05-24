@@ -77,9 +77,7 @@ builder.Services.AddScoped<IEnrollmentStatusService, EnrollmentStatusService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IFeedbackStatusService, FeedbackStatusService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
-builder.Services.AddScoped<ILessonStatusService, LessonStatusService>();
 builder.Services.AddScoped<IModuleService, ModuleService>();
-builder.Services.AddScoped<IModuleStatusService, ModuleStatusService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentStatusService, PaymentStatusService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
@@ -89,7 +87,6 @@ builder.Services.AddScoped<ITestService, TestService>();
 builder.Services.AddScoped<ITestSubmissionService, TestSubmissionService>();
 builder.Services.AddScoped<ITestSubmissionAnswerService, TestSubmissionAnswerService>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
-builder.Services.AddScoped<IUserCoachApplicationStatusService, UserCoachApplicationStatusService>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
 
 

@@ -9,9 +9,14 @@ namespace Coachify.BLL.Mappings
         public TestProfile()
         {
             CreateMap<Test, TestDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.TestId)); ;
-            CreateMap<CreateTestDto, Test>().ReverseMap();
-            CreateMap<Test, UpdateTestDto>().ReverseMap();
+                .ForMember(d => d.Id,   o => o.MapFrom(s => s.TestId))
+                .ReverseMap();   
+
+            CreateMap<CreateTestDto, Test>();
+            CreateMap<UpdateTestDto, Test>().ReverseMap();
+            CreateMap<CreateTestWithQuestionsDto, Test>();
+
+
         }
     }
 }

@@ -7,6 +7,6 @@
         public string Bio { get; set; }
         public string Specialization { get; set; }
         public DateTime CreatedAt { get; set; }
-        public int StatusId { get; set; }
+        public StatusDto Status { get; set; } = null!;
     }
 }

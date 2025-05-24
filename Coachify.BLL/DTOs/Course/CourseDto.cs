@@ -12,7 +12,6 @@ public class CourseDto
     public double Price { get; set; }
     public int MaxClients { get; set; }
     public string? PosterUrl { get; set; }
-
     public DateTime SubmittedAt { get; set; }
 
     public int CategoryId { get; set; }

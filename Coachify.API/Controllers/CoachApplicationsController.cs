@@ -24,18 +24,21 @@ public class CoachApplicationsController : ControllerBase
         return d == null ? NotFound() : Ok(d);
     }
 
+    [HttpGet("pending")]
+    public async Task<IActionResult> GetPendingApplications()
+    {
+        var pendingApplications = await _service.GetPendingApplicationsAsync();
+        return Ok(pendingApplications);
+    }
+    
     [HttpPost]
     public async Task<IActionResult> Create(CreateCoachApplicationDto dto)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         var c = await _service.CreateAsync(dto);
         return CreatedAtAction(nameof(Get), new { id = c.ApplicationId }, c);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateCoachApplicationDto dto)
-    {
-        await _service.UpdateAsync(id, dto);
-        return NoContent();
     }
 
     [HttpPost("approve/{applicationId}")]
@@ -45,6 +48,7 @@ public class CoachApplicationsController : ControllerBase
         {
             await _service.ApproveCoachApplicationAsync(applicationId);
             return Ok(new { message = "Application approved successfully" });
+            // или return NoContent();
         }
         catch (Exception ex)
         {
@@ -59,21 +63,13 @@ public class CoachApplicationsController : ControllerBase
         {
             await _service.RejectCoachApplicationAsync(applicationId);
             return Ok(new { message = "Application rejected successfully" });
+            // или return NoContent();
         }
         catch (Exception ex)
         {
             return BadRequest(new { message = ex.Message });
         }
     }
-
-    
-    [HttpGet("pending")]
-    public async Task<IActionResult> GetPendingApplications()
-    {
-        var pendingApplications = await _service.GetPendingApplicationsAsync();
-        return Ok(pendingApplications);
-    }
-
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id) 

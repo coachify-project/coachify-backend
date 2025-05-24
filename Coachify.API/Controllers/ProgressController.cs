@@ -35,9 +35,17 @@ namespace Coachify.API.Controllers
         [HttpPost("lessons/start/{userId}/{lessonId}")]
         public async Task<IActionResult> StartLesson(int userId, int lessonId)
         {
-            var result = await _progress.StartLessonAsync(userId, lessonId);
-            return Ok(new { success = result });
+            try
+            {
+                var result = await _progress.StartLessonAsync(userId, lessonId);
+                return Ok(new { success = result });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
+
 
         // POST api/progress/lessons/complete/5/20
         [HttpPost("lessons/complete/{userId}/{lessonId}")]

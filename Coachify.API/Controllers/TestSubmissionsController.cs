@@ -1,68 +1,48 @@
-﻿using Coachify.BLL.DTOs.TestSubmission;
+﻿using Microsoft.AspNetCore.Mvc;
+using Coachify.BLL.DTOs.TestSubmission;
 using Coachify.BLL.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace Coachify.API.Controllers
+namespace Coachify.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class TestSubmissionController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class TestSubmissionsController : ControllerBase
+    private readonly ITestSubmissionService _service;
+
+    public TestSubmissionController(ITestSubmissionService service)
     {
-        private readonly ITestSubmissionService _service;
+        _service = service;
+    }
+    
+    [HttpPost("submit")]
+    public async Task<IActionResult> SubmitTest([FromBody] SubmitTestRequestDto dto)
+    {
+        var result = await _service.CreateAsync(dto);
+        return Ok(result);
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var submissions = await _service.GetAllAsync();
+        return Ok(submissions);
+    }
+    
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var submission = await _service.GetByIdAsync(id);
+        if (submission == null)
+            return NotFound();
 
-        public TestSubmissionsController(ITestSubmissionService service)
-        {
-            _service = service;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TestSubmissionDto>>> GetAll()
-        {
-            var submissions = await _service.GetAllAsync();
-            return Ok(submissions);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var result = await _service.GetByIdAsync(id);
-            if (result == null)
-                return NotFound();
-            return Ok(result);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateTestSubmissionDto dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var result = await _service.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = result.SubmissionId }, result);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, UpdateTestSubmissionDto dto)
-        {
-            try
-            {
-                await _service.UpdateAsync(id, dto);
-                return NoContent();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            bool deleted = await _service.DeleteAsync(id);
-            if (!deleted) return NotFound();
-            return NoContent();
-        }
+        return Ok(submission);
+    }
+    
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var success = await _service.DeleteAsync(id);
+        return success ? Ok() : NotFound();
     }
 }

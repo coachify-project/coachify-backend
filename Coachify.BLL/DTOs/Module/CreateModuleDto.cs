@@ -1,11 +1,17 @@
-﻿namespace Coachify.BLL.DTOs.Module;
+﻿using System.ComponentModel.DataAnnotations;
+using Coachify.BLL.DTOs.Lesson;
+
+namespace Coachify.BLL.DTOs.Module;
 
 public class CreateModuleDto
 {
-    public int CourseId { get; set; }
-    public string Title { get; set; }
-    public string Description { get; set; }
+    [Required] public int CourseId { get; set; }
+
+    [Required, MaxLength(255)] public string Title { get; set; } = null!;
+
+    [Required, MaxLength(255)] public string Description { get; set; } = null!;
+
+    public int? TestId { get; set; }
 
     public List<string> SkillNames { get; set; } = new();
-    public List<string> Lessons { get; set; } = new();
 }
