@@ -23,12 +23,12 @@ public interface IModuleService
 
     Task<bool> DeleteAsync(int id);
 
-    Task<bool> StartModuleAsync(int userId, int moduleId);
-
-    Task<bool> MarkLessonCompletedAsync(int userId, int lessonId);
-
-    Task<IEnumerable<UserLessonProgress>> GetUserLessonProgressAsync(int userId, int moduleId);
-
-    Task<bool> CompleteModuleAsync(int userId, int moduleId);
+    // Task<bool> StartModuleAsync(int userId, int moduleId);
+    //
+    // Task<bool> MarkLessonCompletedAsync(int userId, int lessonId);
+    //
+    // Task<IEnumerable<UserLessonProgress>> GetUserLessonProgressAsync(int userId, int moduleId);
+    //
+    // Task<bool> CompleteModuleAsync(int userId, int moduleId);
 
 }

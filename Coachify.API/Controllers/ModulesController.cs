@@ -1,9 +1,12 @@
-﻿using Coachify.BLL.DTOs.Module;
-using Coachify.BLL.DTOs.Test;
-using Coachify.BLL.DTOs.Progress;
-using Coachify.BLL.Interfaces;
-using Coachify.DAL.Entities;
+﻿// ModulesController.cs
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Coachify.BLL.Interfaces;
+using Coachify.BLL.DTOs;
+using Coachify.BLL.DTOs.Module;
+using Coachify.BLL.DTOs.Test;
 
 namespace Coachify.API.Controllers
 {
@@ -127,78 +130,6 @@ namespace Coachify.API.Controllers
                 if (!deleted)
                     return NotFound();
                 return NoContent();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        // POST: api/modules/5/start?userId=10
-        [HttpPost("{moduleId}/start")]
-        public async Task<ActionResult> StartModule(int moduleId, [FromQuery] int userId)
-        {
-            try
-            {
-                var success = await _service.StartModuleAsync(userId, moduleId);
-                return Ok(new { success });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { message = "Ошибка при запуске модуля." });
-            }
-        }
-
-        // POST: api/modules/lesson/15/complete?userId=10
-        [HttpPost("lesson/{lessonId}/complete")]
-        public async Task<ActionResult> MarkLessonCompleted(int lessonId, [FromQuery] int userId)
-        {
-            try
-            {
-                var success = await _service.MarkLessonCompletedAsync(userId, lessonId);
-                return Ok(new { success });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        // GET: api/modules/5/user/10/progress
-        [HttpGet("{moduleId}/user/{userId}/progress")]
-        public async Task<ActionResult<IEnumerable<UserLessonProgress>>> GetUserLessonProgress(int moduleId, int userId)
-        {
-            try
-            {
-                var progress = await _service.GetUserLessonProgressAsync(userId, moduleId);
-                return Ok(progress);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        // POST: api/modules/5/complete?userId=10
-        [HttpPost("{moduleId}/complete")]
-        public async Task<ActionResult> CompleteModule(int moduleId, [FromQuery] int userId)
-        {
-            try
-            {
-                var success = await _service.CompleteModuleAsync(userId, moduleId);
-                return Ok(new { success });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
             }
             catch (InvalidOperationException ex)
             {

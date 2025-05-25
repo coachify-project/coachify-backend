@@ -17,6 +17,23 @@ namespace Coachify.BLL.Services
         {
             _db = db;
         }
+        public async Task<IEnumerable<UserLessonProgress>> GetUserLessonProgressAsync(int userId, int moduleId)
+        {
+            var module = await _db.Modules
+                .Include(m => m.Lessons)
+                .FirstOrDefaultAsync(m => m.ModuleId == moduleId);
+
+            if (module == null)
+                throw new ArgumentException($"Модуль с ID {moduleId} не найден");
+
+            var lessonIds = module.Lessons.Select(l => l.LessonId).ToList();
+
+            var progresses = await _db.UserLessonProgresses
+                .Where(p => p.UserId == userId && lessonIds.Contains(p.LessonId))
+                .ToListAsync();
+
+            return progresses;
+        }
 
         public async Task<bool> StartLessonAsync(int userId, int lessonId)
         {

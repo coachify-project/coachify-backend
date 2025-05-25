@@ -1,4 +1,5 @@
 ﻿// Module.cs
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -10,11 +11,9 @@ namespace Coachify.DAL.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ModuleId { get; set; }
 
-        [Required, MaxLength(255)]
-        public string Title { get; set; } = null!;
+        [Required, MaxLength(255)] public string Title { get; set; } = null!;
 
-        [Required, MaxLength(255)]
-        public string Description { get; set; } = null!;
+        [Required, MaxLength(255)] public string Description { get; set; } = null!;
 
         public int CourseId { get; set; }
         public Course Course { get; set; } = null!;
@@ -26,6 +25,8 @@ namespace Coachify.DAL.Entities
 
         public int? TestId { get; set; }
         public Test? Test { get; set; }
+        public int StatusId { get; set; }
+        public ProgressStatus Status { get; set; } = null!;
 
         // Навигация на прогресс
         public ICollection<UserModuleProgress> UserProgresses { get; set; } = new List<UserModuleProgress>();

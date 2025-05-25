@@ -1,13 +1,18 @@
-﻿
-namespace Coachify.BLL.Interfaces;
+﻿// IProgressService.cs (обновленный)
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Coachify.DAL.Entities;
 
-public interface IProgressService
+namespace Coachify.BLL.Interfaces
 {
-    Task<bool> StartLessonAsync(int userId, int lessonId);
-    Task<bool> CompleteLessonAsync(int userId, int lessonId);
-    Task<bool> StartModuleAsync(int userId, int moduleId);
-    Task<bool> CompleteModuleAsync(int userId, int moduleId);
-    Task<IEnumerable<int>> GetCompletedLessonsAsync(int userId, int courseId);
-    Task<IEnumerable<int>> GetCompletedModulesAsync(int userId, int courseId);
-
+    public interface IProgressService
+    {
+        Task<IEnumerable<int>> GetCompletedLessonsAsync(int userId, int courseId);
+        Task<IEnumerable<int>> GetCompletedModulesAsync(int userId, int courseId);
+        Task<IEnumerable<UserLessonProgress>> GetUserLessonProgressAsync(int userId, int moduleId);
+        Task<bool> StartLessonAsync(int userId, int lessonId);
+        Task<bool> CompleteLessonAsync(int userId, int lessonId);
+        Task<bool> StartModuleAsync(int userId, int moduleId);
+        Task<bool> CompleteModuleAsync(int userId, int moduleId);
+    }
 }

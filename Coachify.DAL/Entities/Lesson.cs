@@ -24,6 +24,8 @@ namespace Coachify.DAL.Entities
 
         public int ModuleId { get; set; }
         public Module Module { get; set; } = null!;
+        public int StatusId { get; set; }
+        public ProgressStatus Status { get; set; } = null!;
         
         public ICollection<UserLessonProgress> UserProgresses { get; set; } = new List<UserLessonProgress>();
     }

@@ -9,7 +9,7 @@ namespace Coachify.BLL.Mappings
         public CoachApplicationProfile()
         {
             CreateMap<CoachApplication, CoachApplicationDto>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.StatusName, opt => opt.MapFrom(src => src.Status.Name))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.SubmittedAt));
 
             // Create application from user

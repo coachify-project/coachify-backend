@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Coachify.BLL.DTOs.Progress;
 
 namespace Coachify.BLL.Services
 {
@@ -31,6 +32,68 @@ namespace Coachify.BLL.Services
             return lesson == null ? null : _mapper.Map<LessonDto>(lesson);
         }
 
+        public async Task<IEnumerable<LessonDto>> GetByModuleAsync(int moduleId)
+        {
+            var module = await _db.Modules
+                .FirstOrDefaultAsync(m => m.ModuleId == moduleId);
+
+            if (module == null)
+                throw new ArgumentException($"Модуль с ID {moduleId} не найден");
+
+            var lessons = await _db.Lessons
+                .Where(l => l.ModuleId == moduleId)
+                .Select(l => new LessonDto
+                {
+                    LessonId = l.LessonId,
+                    Title = l.Title,
+                    Introduction = l.Introduction,
+                    LessonObjectives = l.LessonObjectives,
+                    VideoUrl = l.VideoUrl,
+                    ModuleId = l.ModuleId,
+                    Status = new ProgressStatusDto
+                    {
+                        StatusId = 2,
+                        Name = "Not Started"
+                    } // По умолчанию "Not Started"
+                })
+                .ToListAsync();
+
+            return lessons;
+        }
+
+        public async Task<IEnumerable<LessonDto>> GetByModuleForUserAsync(int moduleId, int userId)
+        {
+            var module = await _db.Modules
+                .FirstOrDefaultAsync(m => m.ModuleId == moduleId);
+
+            if (module == null)
+                throw new ArgumentException($"Модуль с ID {moduleId} не найден");
+
+            var lessons = await _db.Lessons
+                .Where(l => l.ModuleId == moduleId)
+                .GroupJoin(
+                    _db.UserLessonProgresses.Where(p => p.UserId == userId),
+                    lesson => lesson.LessonId,
+                    progress => progress.LessonId,
+                    (lesson, progresses) => new { lesson, progress = progresses.FirstOrDefault() }
+                )
+                .Select(x => new LessonDto
+                {
+                    LessonId = x.lesson.LessonId,
+                    Title = x.lesson.Title,
+                    Introduction = x.lesson.Introduction,
+                    LessonObjectives = x.lesson.LessonObjectives,
+                    VideoUrl = x.lesson.VideoUrl,
+                    ModuleId = x.lesson.ModuleId,
+                    Status = x.progress != null
+                        ? new ProgressStatusDto { StatusId = x.progress.StatusId, Name = x.progress.Status.Name }
+                        : new ProgressStatusDto { StatusId = 2, Name = "Not Started" }
+                })
+                .ToListAsync();
+
+            return lessons;
+        }
+
         public async Task<LessonDto> CreateAsync(CreateLessonDto dto)
         {
             var module = await _db.Modules
@@ -45,6 +108,10 @@ namespace Coachify.BLL.Services
                     "Добавлять уроки можно только в курсе в черновике или после отклонения.");
 
             string videoUrl = ProcessVideoUrl(dto.VideoUrl);
+            var draftStatus = await _db.ProgressStatuses.FindAsync(1);
+            if (draftStatus == null)
+                throw new InvalidOperationException("Статус 'Draft' не найден в таблице ProgressStatus.");
+
 
             var lesson = new Lesson
             {
@@ -52,7 +119,9 @@ namespace Coachify.BLL.Services
                 Introduction = dto.Introduction,
                 LessonObjectives = dto.LessonObjectives,
                 VideoUrl = videoUrl,
-                ModuleId = dto.ModuleId
+                ModuleId = dto.ModuleId,
+                Status = draftStatus
+
             };
 
             _db.Lessons.Add(lesson);
@@ -72,122 +141,122 @@ namespace Coachify.BLL.Services
             return url;
         }
 
-        public async Task<bool> StartLessonAsync(int userId, int lessonId)
-        {
-            var user = await _db.Users.FindAsync(userId);
-            if (user == null)
-                throw new ArgumentException($"Пользователь с ID {userId} не найден");
-
-            var lesson = await _db.Lessons
-                .Include(l => l.Module)
-                .ThenInclude(m => m.Course)
-                .FirstOrDefaultAsync(l => l.LessonId == lessonId);
-
-            if (lesson == null)
-                throw new ArgumentException($"Урок с ID {lessonId} не найден");
-
-            var enrollment = await _db.Enrollments
-                .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == lesson.Module.CourseId);
-
-            if (enrollment == null)
-                throw new InvalidOperationException("Пользователь не зачислен на курс.");
-
-            var progress = await _db.UserLessonProgresses
-                .FirstOrDefaultAsync(p => p.UserId == userId && p.LessonId == lessonId);
-
-            if (progress == null)
-            {
-                progress = new UserLessonProgress
-                {
-                    UserId = userId,
-                    LessonId = lessonId,
-                    StatusId = 3, // In Progress
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _db.UserLessonProgresses.Add(progress);
-            }
-            else if (progress.StatusId == 2) // Not Started
-            {
-                progress.StatusId = 3;
-                progress.UpdatedAt = DateTime.UtcNow;
-            }
-
-            await _db.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> CompleteLessonAsync(int userId, int lessonId)
-        {
-            var lesson = await _db.Lessons
-                .Include(l => l.Module)
-                .ThenInclude(m => m.Course)
-                .FirstOrDefaultAsync(l => l.LessonId == lessonId);
-
-            if (lesson == null)
-                throw new ArgumentException($"Урок с ID {lessonId} не найден");
-
-            var enrollment = await _db.Enrollments
-                .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == lesson.Module.CourseId);
-
-            if (enrollment == null)
-                throw new InvalidOperationException("Пользователь не зачислен на курс.");
-
-            var progress = await _db.UserLessonProgresses
-                .FirstOrDefaultAsync(p => p.UserId == userId && p.LessonId == lessonId);
-
-            if (progress == null)
-            {
-                progress = new UserLessonProgress
-                {
-                    UserId = userId,
-                    LessonId = lessonId,
-                    StatusId = 4, // Completed
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _db.UserLessonProgresses.Add(progress);
-            }
-            else
-            {
-                progress.StatusId = 4;
-                progress.UpdatedAt = DateTime.UtcNow;
-            }
-
-            // Check if all lessons in module are completed
-            var lessonIdsInModule = await _db.Lessons
-                .Where(l => l.ModuleId == lesson.ModuleId)
-                .Select(l => l.LessonId)
-                .ToListAsync();
-
-            var completedCount = await _db.UserLessonProgresses
-                .CountAsync(p => p.UserId == userId &&
-                                 lessonIdsInModule.Contains(p.LessonId) &&
-                                 p.StatusId == 4);
-
-            if (completedCount == lessonIdsInModule.Count)
-            {
-                var moduleProgress = await _db.UserModuleProgresses
-                    .FirstOrDefaultAsync(mp => mp.UserId == userId && mp.ModuleId == lesson.ModuleId);
-
-                if (moduleProgress == null)
-                {
-                    _db.UserModuleProgresses.Add(new UserModuleProgress
-                    {
-                        UserId = userId,
-                        ModuleId = lesson.ModuleId,
-                        StatusId = 4,
-                        UpdatedAt = DateTime.UtcNow
-                    });
-                }
-                else
-                {
-                    moduleProgress.StatusId = 4;
-                    moduleProgress.UpdatedAt = DateTime.UtcNow;
-                }
-            }
-
-            await _db.SaveChangesAsync();
-            return true;
-        }
+        // public async Task<bool> StartLessonAsync(int userId, int lessonId)
+        // {
+        //     var user = await _db.Users.FindAsync(userId);
+        //     if (user == null)
+        //         throw new ArgumentException($"Пользователь с ID {userId} не найден");
+        //
+        //     var lesson = await _db.Lessons
+        //         .Include(l => l.Module)
+        //         .ThenInclude(m => m.Course)
+        //         .FirstOrDefaultAsync(l => l.LessonId == lessonId);
+        //
+        //     if (lesson == null)
+        //         throw new ArgumentException($"Урок с ID {lessonId} не найден");
+        //
+        //     var enrollment = await _db.Enrollments
+        //         .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == lesson.Module.CourseId);
+        //
+        //     if (enrollment == null)
+        //         throw new InvalidOperationException("Пользователь не зачислен на курс.");
+        //
+        //     var progress = await _db.UserLessonProgresses
+        //         .FirstOrDefaultAsync(p => p.UserId == userId && p.LessonId == lessonId);
+        //
+        //     if (progress == null)
+        //     {
+        //         progress = new UserLessonProgress
+        //         {
+        //             UserId = userId,
+        //             LessonId = lessonId,
+        //             StatusId = 3, // In Progress
+        //             UpdatedAt = DateTime.UtcNow
+        //         };
+        //         _db.UserLessonProgresses.Add(progress);
+        //     }
+        //     else if (progress.StatusId == 2) // Not Started
+        //     {
+        //         progress.StatusId = 3;
+        //         progress.UpdatedAt = DateTime.UtcNow;
+        //     }
+        //
+        //     await _db.SaveChangesAsync();
+        //     return true;
+        // }
+        //
+        // public async Task<bool> CompleteLessonAsync(int userId, int lessonId)
+        // {
+        //     var lesson = await _db.Lessons
+        //         .Include(l => l.Module)
+        //         .ThenInclude(m => m.Course)
+        //         .FirstOrDefaultAsync(l => l.LessonId == lessonId);
+        //
+        //     if (lesson == null)
+        //         throw new ArgumentException($"Урок с ID {lessonId} не найден");
+        //
+        //     var enrollment = await _db.Enrollments
+        //         .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == lesson.Module.CourseId);
+        //
+        //     if (enrollment == null)
+        //         throw new InvalidOperationException("Пользователь не зачислен на курс.");
+        //
+        //     var progress = await _db.UserLessonProgresses
+        //         .FirstOrDefaultAsync(p => p.UserId == userId && p.LessonId == lessonId);
+        //
+        //     if (progress == null)
+        //     {
+        //         progress = new UserLessonProgress
+        //         {
+        //             UserId = userId,
+        //             LessonId = lessonId,
+        //             StatusId = 4, // Completed
+        //             UpdatedAt = DateTime.UtcNow
+        //         };
+        //         _db.UserLessonProgresses.Add(progress);
+        //     }
+        //     else
+        //     {
+        //         progress.StatusId = 4;
+        //         progress.UpdatedAt = DateTime.UtcNow;
+        //     }
+        //
+        //     // Check if all lessons in module are completed
+        //     var lessonIdsInModule = await _db.Lessons
+        //         .Where(l => l.ModuleId == lesson.ModuleId)
+        //         .Select(l => l.LessonId)
+        //         .ToListAsync();
+        //
+        //     var completedCount = await _db.UserLessonProgresses
+        //         .CountAsync(p => p.UserId == userId &&
+        //                          lessonIdsInModule.Contains(p.LessonId) &&
+        //                          p.StatusId == 4);
+        //
+        //     if (completedCount == lessonIdsInModule.Count)
+        //     {
+        //         var moduleProgress = await _db.UserModuleProgresses
+        //             .FirstOrDefaultAsync(mp => mp.UserId == userId && mp.ModuleId == lesson.ModuleId);
+        //
+        //         if (moduleProgress == null)
+        //         {
+        //             _db.UserModuleProgresses.Add(new UserModuleProgress
+        //             {
+        //                 UserId = userId,
+        //                 ModuleId = lesson.ModuleId,
+        //                 StatusId = 4,
+        //                 UpdatedAt = DateTime.UtcNow
+        //             });
+        //         }
+        //         else
+        //         {
+        //             moduleProgress.StatusId = 4;
+        //             moduleProgress.UpdatedAt = DateTime.UtcNow;
+        //         }
+        //     }
+        //
+        //     await _db.SaveChangesAsync();
+        //     return true;
+        // }
 
         public async Task<LessonDto> UpdateAsync(int id, UpdateLessonDto dto)
         {

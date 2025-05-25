@@ -11,8 +11,9 @@ public class ModuleDto
     public int CourseId { get; set; }
     public string Title { get; set; } = null!;
     public string Description { get; set; } = null!;
+    public List<LessonDto> Lessons { get; set; } = new();
+    public TestDto? Test { get; set; }
     public ProgressStatusDto Status { get; set; } = null!;
-    public List<LessonDto> Lessons { get; set; } = new(); 
-    public TestDto? Test { get; set; } 
+
     public List<SkillDto> Skills { get; set; } = new();
 }

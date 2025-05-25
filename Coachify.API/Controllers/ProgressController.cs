@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
-using Coachify.BLL.Interfaces;
+﻿// ProgressController.cs (исправленная версия)
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Coachify.BLL.Interfaces;
 
 namespace Coachify.API.Controllers
 {
@@ -17,23 +19,52 @@ namespace Coachify.API.Controllers
 
         // GET api/progress/user/5/course/10/lessons
         [HttpGet("user/{userId}/course/{courseId}/lessons")]
-        public async Task<IActionResult> GetCompletedLessons(int userId, int courseId)
+        public async Task<ActionResult> GetCompletedLessons(int userId, int courseId)
         {
-            var list = await _progress.GetCompletedLessonsAsync(userId, courseId);
-            return Ok(new { completedLessons = list });
+            try
+            {
+                var list = await _progress.GetCompletedLessonsAsync(userId, courseId);
+                return Ok(new { completedLessons = list });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         // GET api/progress/user/5/course/10/modules
         [HttpGet("user/{userId}/course/{courseId}/modules")]
-        public async Task<IActionResult> GetCompletedModules(int userId, int courseId)
+        public async Task<ActionResult> GetCompletedModules(int userId, int courseId)
         {
-            var list = await _progress.GetCompletedModulesAsync(userId, courseId);
-            return Ok(new { completedModules = list });
+            try
+            {
+                var list = await _progress.GetCompletedModulesAsync(userId, courseId);
+                return Ok(new { completedModules = list });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        // GET api/progress/user/5/module/10/lessons - НОВЫЙ МЕТОД
+        [HttpGet("user/{userId}/module/{moduleId}/lessons")]
+        public async Task<ActionResult> GetUserLessonProgress(int userId, int moduleId)
+        {
+            try
+            {
+                var progress = await _progress.GetUserLessonProgressAsync(userId, moduleId);
+                return Ok(new { lessonProgress = progress });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         // POST api/progress/lessons/start/5/20
         [HttpPost("lessons/start/{userId}/{lessonId}")]
-        public async Task<IActionResult> StartLesson(int userId, int lessonId)
+        public async Task<ActionResult> StartLesson(int userId, int lessonId)
         {
             try
             {
@@ -46,29 +77,49 @@ namespace Coachify.API.Controllers
             }
         }
 
-
         // POST api/progress/lessons/complete/5/20
         [HttpPost("lessons/complete/{userId}/{lessonId}")]
-        public async Task<IActionResult> CompleteLesson(int userId, int lessonId)
+        public async Task<ActionResult> CompleteLesson(int userId, int lessonId)
         {
-            var result = await _progress.CompleteLessonAsync(userId, lessonId);
-            return Ok(new { success = result });
+            try
+            {
+                var result = await _progress.CompleteLessonAsync(userId, lessonId);
+                return Ok(new { success = result });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         // POST api/progress/modules/start/5/7
         [HttpPost("modules/start/{userId}/{moduleId}")]
-        public async Task<IActionResult> StartModule(int userId, int moduleId)
+        public async Task<ActionResult> StartModule(int userId, int moduleId)
         {
-            var result = await _progress.StartModuleAsync(userId, moduleId);
-            return Ok(new { success = result });
+            try
+            {
+                var result = await _progress.StartModuleAsync(userId, moduleId);
+                return Ok(new { success = result });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         // POST api/progress/modules/complete/5/7
         [HttpPost("modules/complete/{userId}/{moduleId}")]
-        public async Task<IActionResult> CompleteModule(int userId, int moduleId)
+        public async Task<ActionResult> CompleteModule(int userId, int moduleId)
         {
-            var result = await _progress.CompleteModuleAsync(userId, moduleId);
-            return Ok(new { success = result });
+            try
+            {
+                var result = await _progress.CompleteModuleAsync(userId, moduleId);
+                return Ok(new { success = result });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
     }
 }

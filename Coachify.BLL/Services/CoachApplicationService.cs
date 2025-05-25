@@ -19,22 +19,28 @@ public class CoachApplicationService : ICoachApplicationService
     }
 
     public async Task<IEnumerable<CoachApplicationDto>> GetAllAsync() =>
-        _mapper.Map<IEnumerable<CoachApplicationDto>>(await _db.CoachApplications.ToListAsync());
+        _mapper.Map<IEnumerable<CoachApplicationDto>>(await _db.CoachApplications
+            .Include(a => a.Status)
+            .ToListAsync());
 
     public async Task<CoachApplicationDto?> GetByIdAsync(int id)
     {
-        var application = await _db.CoachApplications.FindAsync(id);
+        var application = await _db.CoachApplications
+            .Include(a => a.Status) 
+            .FirstOrDefaultAsync(a => a.ApplicationId == id);
         return application == null ? null : _mapper.Map<CoachApplicationDto>(application);
     }
 
     public async Task<IEnumerable<CoachApplicationDto>> GetPendingApplicationsAsync()
     {
         var pending = await _db.CoachApplications
-            .Where(a => a.StatusId == 1) // 1 = Pending
+            .Where(a => a.StatusId == 1)
+            .Include(a => a.Status) 
             .ToListAsync();
 
         return _mapper.Map<IEnumerable<CoachApplicationDto>>(pending);
     }
+
 
     public async Task ApproveCoachApplicationAsync(int applicationId)
     {
@@ -49,12 +55,13 @@ public class CoachApplicationService : ICoachApplicationService
             throw new InvalidOperationException("Application is not in pending state.");
 
         application.StatusId = 2; // Approved
-        
+
         var coach = new Coach
         {
             CoachId = application.UserId,
             Bio = application.Bio,
             Specialization = application.Specialization,
+            AvatarUrl = "" ,
             Verified = true
         };
         _db.Coaches.Add(coach);
@@ -83,7 +90,7 @@ public class CoachApplicationService : ICoachApplicationService
 
         if (application.Applicant != null && application.Applicant.RoleId != 3)
         {
-            application.Applicant.RoleId = 2;// Client
+            application.Applicant.RoleId = 2; // Client
         }
 
         await _db.SaveChangesAsync();
@@ -95,13 +102,13 @@ public class CoachApplicationService : ICoachApplicationService
 
         application.StatusId = 1; //Pending
         application.SubmittedAt = DateTime.UtcNow;
-        
+
         _db.CoachApplications.Add(application);
         await _db.SaveChangesAsync();
 
         return _mapper.Map<CoachApplicationDto>(application);
     }
-    
+
 
     public async Task<bool> DeleteAsync(int id)
     {

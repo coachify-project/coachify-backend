@@ -31,10 +31,18 @@ namespace Coachify.BLL.Services
         {
             var modules = await _db.Modules
                 .Where(m => m.CourseId == courseId)
+                .Include(m => m.Status)
                 .Include(m => m.Skills)
+                .Include(m => m.Lessons)
+                .ThenInclude(l => l.Status)
+                .Include(m => m.Test)
+                .ThenInclude(t => t.Questions)
+                .ThenInclude(q => q.Options)
                 .ToListAsync();
+
             return _mapper.Map<IEnumerable<ModuleDto>>(modules);
         }
+
 
         public async Task<ModuleDto?> GetByIdAsync(int id)
         {
@@ -143,13 +151,19 @@ namespace Coachify.BLL.Services
                 existingSkills.AddRange(newSkills);
             }
 
+            var draftStatus = await _db.ProgressStatuses.FindAsync(1);
+            if (draftStatus == null)
+                throw new InvalidOperationException("Статус 'Draft' не найден в таблице ProgressStatus.");
+
             var module = new Module
             {
                 CourseId = dto.CourseId,
                 Title = dto.Title,
                 Description = dto.Description,
                 Skills = existingSkills,
-                TestId = dto.TestId
+                TestId = dto.TestId,
+                StatusId = draftStatus.StatusId,
+                Status = draftStatus
             };
 
             _db.Modules.Add(module);
@@ -188,6 +202,7 @@ namespace Coachify.BLL.Services
             module.Description = dto.Description;
             module.Skills = existingSkills;
             module.TestId = dto.TestId;
+            module.StatusId = 1; // Draft
 
             await _db.SaveChangesAsync();
             return _mapper.Map<ModuleDto>(module);
@@ -209,163 +224,164 @@ namespace Coachify.BLL.Services
             return true;
         }
 
-        public async Task<bool> StartModuleAsync(int userId, int moduleId)
-        {
-            var user = await _db.Users.FindAsync(userId);
-            if (user == null)
-                throw new ArgumentException($"Пользователь с ID {userId} не найден");
-
-            var module = await _db.Modules.Include(m => m.Course).FirstOrDefaultAsync(m => m.ModuleId == moduleId);
-            if (module == null)
-                throw new ArgumentException($"Модуль с ID {moduleId} не найден");
-
-            var enrollment =
-                await _db.Enrollments.FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == module.CourseId);
-            if (enrollment == null)
-                throw new ArgumentException($"Пользователь не зачислен на курс, содержащий этот модуль");
-
-            var progress =
-                await _db.UserModuleProgresses.FirstOrDefaultAsync(p => p.UserId == userId && p.ModuleId == moduleId);
-            if (progress == null)
-            {
-                progress = new UserModuleProgress
-                {
-                    UserId = userId,
-                    ModuleId = moduleId,
-                    StatusId = 3,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _db.UserModuleProgresses.Add(progress);
-            }
-            else
-            {
-                progress.StatusId = 3;
-                progress.UpdatedAt = DateTime.UtcNow;
-            }
-
-            if (enrollment.StatusId == 1)
-            {
-                enrollment.StatusId = 2;
-            }
-
-            await _db.SaveChangesAsync();
-            return true;
-        }
-
-
-        public async Task<bool> MarkLessonCompletedAsync(int userId, int lessonId)
-        {
-            var user = await _db.Users.FindAsync(userId);
-            if (user == null)
-                throw new ArgumentException($"Пользователь с ID {userId} не найден");
-
-            var lesson = await _db.Lessons.Include(l => l.Module).ThenInclude(m => m.Course)
-                .FirstOrDefaultAsync(l => l.LessonId == lessonId);
-            if (lesson == null)
-                throw new ArgumentException($"Урок с ID {lessonId} не найден");
-
-            var enrollment = await _db.Enrollments
-                .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == lesson.Module.CourseId);
-            if (enrollment == null)
-                throw new InvalidOperationException("Пользователь не зачислен на курс, содержащий этот урок");
-
-            var progress = await _db.UserLessonProgresses
-                .FirstOrDefaultAsync(p => p.UserId == userId && p.LessonId == lessonId);
-
-            if (progress == null)
-            {
-                progress = new UserLessonProgress
-                {
-                    UserId = userId,
-                    LessonId = lessonId,
-                    StatusId = 4, // Completed
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _db.UserLessonProgresses.Add(progress);
-            }
-            else
-            {
-                progress.StatusId = 4; // Completed
-                progress.UpdatedAt = DateTime.UtcNow;
-            }
-
-            await _db.SaveChangesAsync();
-            return true;
-        }
-
-
-        public async Task<IEnumerable<UserLessonProgress>> GetUserLessonProgressAsync(int userId, int moduleId)
-        {
-            var module = await _db.Modules.Include(m => m.Lessons)
-                .FirstOrDefaultAsync(m => m.ModuleId == moduleId);
-
-            if (module == null)
-                throw new ArgumentException($"Модуль с ID {moduleId} не найден");
-
-            var lessonIds = module.Lessons.Select(l => l.LessonId).ToList();
-
-            var progresses = await _db.UserLessonProgresses
-                .Where(p => p.UserId == userId && lessonIds.Contains(p.LessonId))
-                .ToListAsync();
-
-            return progresses;
-        }
-
-
-        public async Task<bool> CompleteModuleAsync(int userId, int moduleId)
-        {
-            var user = await _db.Users.FindAsync(userId);
-            if (user == null)
-                throw new ArgumentException($"Пользователь с ID {userId} не найден");
-
-            var module = await _db.Modules
-                .Include(m => m.Lessons)
-                .Include(m => m.Test)
-                .FirstOrDefaultAsync(m => m.ModuleId == moduleId);
-            if (module == null)
-                throw new ArgumentException($"Модуль с ID {moduleId} не найден");
-
-            var lessonIds = module.Lessons.Select(l => l.LessonId).ToList();
-
-            var completedLessonsCount = await _db.UserLessonProgresses
-                .CountAsync(lp => lp.UserId == userId && lessonIds.Contains(lp.LessonId) && lp.StatusId == 4);
-
-            if (completedLessonsCount < lessonIds.Count)
-                throw new InvalidOperationException("Все уроки модуля должны быть пройдены перед завершением модуля.");
-
-            if (module.Test != null)
-            {
-                bool testPassed = await _db.TestSubmissions
-                    .AnyAsync(ts => ts.TestId == module.Test.TestId && ts.UserId == userId && ts.IsPassed);
-
-                if (!testPassed)
-                    throw new InvalidOperationException(
-                        "Тест модуля должен быть успешно пройден перед завершением модуля.");
-            }
-
-            // Обновляем прогресс пользователя по модулю
-            var progress = await _db.UserModuleProgresses
-                .FirstOrDefaultAsync(p => p.UserId == userId && p.ModuleId == moduleId);
-
-            if (progress == null)
-            {
-                progress = new UserModuleProgress
-                {
-                    UserId = userId,
-                    ModuleId = moduleId,
-                    StatusId = 4, // Completed
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _db.UserModuleProgresses.Add(progress);
-            }
-            else
-            {
-                progress.StatusId = 4;
-                progress.UpdatedAt = DateTime.UtcNow;
-            }
-
-            await _db.SaveChangesAsync();
-            return true;
-        }
+        //     public async Task<bool> StartModuleAsync(int userId, int moduleId)
+        //     {
+        //         var user = await _db.Users.FindAsync(userId);
+        //         if (user == null)
+        //             throw new ArgumentException($"Пользователь с ID {userId} не найден");
+        //
+        //         var module = await _db.Modules.Include(m => m.Course).FirstOrDefaultAsync(m => m.ModuleId == moduleId);
+        //         if (module == null)
+        //             throw new ArgumentException($"Модуль с ID {moduleId} не найден");
+        //
+        //         var enrollment =
+        //             await _db.Enrollments.FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == module.CourseId);
+        //         if (enrollment == null)
+        //             throw new ArgumentException($"Пользователь не зачислен на курс, содержащий этот модуль");
+        //
+        //         var progress =
+        //             await _db.UserModuleProgresses.FirstOrDefaultAsync(p => p.UserId == userId && p.ModuleId == moduleId);
+        //         if (progress == null)
+        //         {
+        //             progress = new UserModuleProgress
+        //             {
+        //                 UserId = userId,
+        //                 ModuleId = moduleId,
+        //                 StatusId = 3,
+        //                 UpdatedAt = DateTime.UtcNow
+        //             };
+        //             _db.UserModuleProgresses.Add(progress);
+        //         }
+        //         else
+        //         {
+        //             progress.StatusId = 3;
+        //             progress.UpdatedAt = DateTime.UtcNow;
+        //         }
+        //
+        //         if (enrollment.StatusId == 1)
+        //         {
+        //             enrollment.StatusId = 2;
+        //         }
+        //
+        //         await _db.SaveChangesAsync();
+        //         return true;
+        //     }
+        //
+        //
+        //     public async Task<bool> MarkLessonCompletedAsync(int userId, int lessonId)
+        //     {
+        //         var user = await _db.Users.FindAsync(userId);
+        //         if (user == null)
+        //             throw new ArgumentException($"Пользователь с ID {userId} не найден");
+        //
+        //         var lesson = await _db.Lessons.Include(l => l.Module).ThenInclude(m => m.Course)
+        //             .FirstOrDefaultAsync(l => l.LessonId == lessonId);
+        //         if (lesson == null)
+        //             throw new ArgumentException($"Урок с ID {lessonId} не найден");
+        //
+        //         var enrollment = await _db.Enrollments
+        //             .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == lesson.Module.CourseId);
+        //         if (enrollment == null)
+        //             throw new InvalidOperationException("Пользователь не зачислен на курс, содержащий этот урок");
+        //
+        //         var progress = await _db.UserLessonProgresses
+        //             .FirstOrDefaultAsync(p => p.UserId == userId && p.LessonId == lessonId);
+        //
+        //         if (progress == null)
+        //         {
+        //             progress = new UserLessonProgress
+        //             {
+        //                 UserId = userId,
+        //                 LessonId = lessonId,
+        //                 StatusId = 4, // Completed
+        //                 UpdatedAt = DateTime.UtcNow
+        //             };
+        //             _db.UserLessonProgresses.Add(progress);
+        //         }
+        //         else
+        //         {
+        //             progress.StatusId = 4; // Completed
+        //             progress.UpdatedAt = DateTime.UtcNow;
+        //         }
+        //
+        //         await _db.SaveChangesAsync();
+        //         return true;
+        //     }
+        //
+        //
+        //     public async Task<IEnumerable<UserLessonProgress>> GetUserLessonProgressAsync(int userId, int moduleId)
+        //     {
+        //         var module = await _db.Modules.Include(m => m.Lessons)
+        //             .FirstOrDefaultAsync(m => m.ModuleId == moduleId);
+        //
+        //         if (module == null)
+        //             throw new ArgumentException($"Модуль с ID {moduleId} не найден");
+        //
+        //         var lessonIds = module.Lessons.Select(l => l.LessonId).ToList();
+        //
+        //         var progresses = await _db.UserLessonProgresses
+        //             .Where(p => p.UserId == userId && lessonIds.Contains(p.LessonId))
+        //             .ToListAsync();
+        //
+        //         return progresses;
+        //     }
+        //
+        //
+        //     public async Task<bool> CompleteModuleAsync(int userId, int moduleId)
+        //     {
+        //         var user = await _db.Users.FindAsync(userId);
+        //         if (user == null)
+        //             throw new ArgumentException($"Пользователь с ID {userId} не найден");
+        //
+        //         var module = await _db.Modules
+        //             .Include(m => m.Lessons)
+        //             .Include(m => m.Test)
+        //             .FirstOrDefaultAsync(m => m.ModuleId == moduleId);
+        //         if (module == null)
+        //             throw new ArgumentException($"Модуль с ID {moduleId} не найден");
+        //
+        //         var lessonIds = module.Lessons.Select(l => l.LessonId).ToList();
+        //
+        //         var completedLessonsCount = await _db.UserLessonProgresses
+        //             .CountAsync(lp => lp.UserId == userId && lessonIds.Contains(lp.LessonId) && lp.StatusId == 4);
+        //
+        //         if (completedLessonsCount < lessonIds.Count)
+        //             throw new InvalidOperationException("Все уроки модуля должны быть пройдены перед завершением модуля.");
+        //
+        //         if (module.Test != null)
+        //         {
+        //             bool testPassed = await _db.TestSubmissions
+        //                 .AnyAsync(ts => ts.TestId == module.Test.TestId && ts.UserId == userId && ts.IsPassed);
+        //
+        //             if (!testPassed)
+        //                 throw new InvalidOperationException(
+        //                     "Тест модуля должен быть успешно пройден перед завершением модуля.");
+        //         }
+        //
+        //         // Обновляем прогресс пользователя по модулю
+        //         var progress = await _db.UserModuleProgresses
+        //             .FirstOrDefaultAsync(p => p.UserId == userId && p.ModuleId == moduleId);
+        //
+        //         if (progress == null)
+        //         {
+        //             progress = new UserModuleProgress
+        //             {
+        //                 UserId = userId,
+        //                 ModuleId = moduleId,
+        //                 StatusId = 4, // Completed
+        //                 UpdatedAt = DateTime.UtcNow
+        //             };
+        //             _db.UserModuleProgresses.Add(progress);
+        //         }
+        //         else
+        //         {
+        //             progress.StatusId = 4;
+        //             progress.UpdatedAt = DateTime.UtcNow;
+        //         }
+        //
+        //         await _db.SaveChangesAsync();
+        //         return true;
+        //     }
+        // }
     }
 }

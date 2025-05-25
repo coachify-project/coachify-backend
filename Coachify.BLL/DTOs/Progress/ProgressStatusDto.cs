@@ -2,6 +2,6 @@
 
 public class ProgressStatusDto
 {
-    public int Id { get; set; }
+    public int StatusId { get; set; }
     public string Name { get; set; } = null!;
 }

@@ -11,14 +11,15 @@ public class TestSubmissionService : ITestSubmissionService
     private readonly IMapper _mapper;
     private readonly IEnrollmentService _enrollmentService;
     private readonly IModuleService _moduleService;
+    private readonly IProgressService _progressService;
 
-    public TestSubmissionService(ApplicationDbContext db, IMapper mapper, IEnrollmentService enrollmentService,IModuleService moduleService)
+    public TestSubmissionService(ApplicationDbContext db, IMapper mapper, IEnrollmentService enrollmentService,
+        IModuleService moduleService)
     {
         _db = db;
         _mapper = mapper;
         _enrollmentService = enrollmentService;
         _moduleService = moduleService;
-
     }
 
     public async Task<IEnumerable<TestSubmissionDto>> GetAllAsync()
@@ -139,13 +140,25 @@ public class TestSubmissionService : ITestSubmissionService
         await _db.SaveChangesAsync();
 
         // 5. Проверка завершения курса
+        // Загружаем тест вместе с модулем
+        var test = await _db.Tests
+            .Include(t => t.Module)
+            .FirstOrDefaultAsync(t => t.TestId == submission.TestId);
+
+        if (test == null || test.Module == null)
+            throw new InvalidOperationException("Test or module not found");
+
+// Теперь можем безопасно получить CourseId
+        var courseId = test.Module.CourseId;
+
         var enrollment = await _db.Enrollments
             .Include(e => e.Course)
             .ThenInclude(c => c.Modules)
             .ThenInclude(m => m.Test)
             .FirstOrDefaultAsync(e =>
-                e.CourseId == submission.Test.Module.CourseId &&
+                e.CourseId == courseId &&
                 e.UserId == dto.UserId);
+
 
         if (enrollment != null && submission.IsPassed)
         {
@@ -178,7 +191,7 @@ public class TestSubmissionService : ITestSubmissionService
             if (allModuleTestsPassed)
             {
                 // Вызываем метод завершения модуля
-                await _moduleService.CompleteModuleAsync(dto.UserId, module.ModuleId);
+                await _progressService.CompleteModuleAsync(dto.UserId, module.ModuleId);
             }
         }
 
