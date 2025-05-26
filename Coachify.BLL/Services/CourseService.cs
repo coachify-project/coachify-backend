@@ -104,12 +104,15 @@ public class CourseService : ICourseService
                 Title = e.Course.Title,
                 CoachId = e.Course.CoachId,
                 CategoryId = e.Course.CategoryId,
+                PosterUrl = e.Course.PosterUrl,
+                ProgressPercentage = e.ProgressPercentage,
                 EnrollmentStatusId = e.StatusId
             })
             .ToListAsync();
 
         return list;
     }
+
 
 
     public async Task<CourseDto> CreateAsync(CreateCourseDto dto)

@@ -69,7 +69,6 @@ public class EnrollmentService : IEnrollmentService
         if (course == null || course.StatusId != 3) // Published
             throw new Exception("Курс недоступен для записи");
 
-        // ⛔ Проверка: уже записан?
         bool alreadyEnrolled = await _db.Enrollments.AnyAsync(e =>
             e.CourseId == dto.CourseId && e.UserId == dto.UserId);
         if (alreadyEnrolled)
@@ -98,7 +97,6 @@ public class EnrollmentService : IEnrollmentService
             throw new KeyNotFoundException($"Enrollment with id={id} not found");
 
         enrollment.StatusId = dto.StatusId;
-        // другие поля если надо
 
         await _db.SaveChangesAsync();
     }

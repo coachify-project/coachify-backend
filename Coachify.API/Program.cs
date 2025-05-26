@@ -94,7 +94,7 @@ builder.Services.AddScoped<IProgressService, ProgressService>();
 // ==== 6. Add Controllers, CORS & Swagger ====
 builder.Services.AddControllers();
 
-var allowedOrigins = new[] { "http://localhost:5173" }; // замени, если нужно
+var allowedOrigins = new[] { "http://localhost:5173" };
 
 builder.Services.AddCors(options =>
 {
@@ -102,7 +102,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials()  // если axios с withCredentials: true
+              .AllowCredentials()  
     );
 });
 
