@@ -136,7 +136,7 @@ public class TestSubmissionService : ITestSubmissionService
             ? (int)Math.Round(100.0 * correctAnswers / totalQuestions)
             : 0;
 
-        submission.IsPassed = submission.Score >= 70;
+        submission.IsPassed = submission.Score >= 30;
         await _db.SaveChangesAsync();
 
         // 5. Проверка завершения курса
