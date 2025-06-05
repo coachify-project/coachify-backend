@@ -174,7 +174,10 @@ namespace Coachify.BLL.Services
 
         public async Task<ModuleDto> UpdateAsync(int id, UpdateModuleDto dto)
         {
-            var module = await _db.Modules.FindAsync(id);
+            var module = await _db.Modules
+                .Include(m => m.Skills) 
+                .FirstOrDefaultAsync(m => m.ModuleId == id);
+        
             if (module == null)
                 throw new KeyNotFoundException("Module not found.");
 
@@ -182,7 +185,7 @@ namespace Coachify.BLL.Services
             if (course.StatusId != 1 && course.StatusId != 4)
                 throw new InvalidOperationException(
                     "Изменять модули можно только в курсе в черновике или после отклонения.");
-
+            
             var existingSkills = await _db.Skills.Where(s => dto.SkillNames.Contains(s.Name)).ToListAsync();
 
             var missingNames = dto.SkillNames
@@ -197,12 +200,17 @@ namespace Coachify.BLL.Services
                 await _db.SaveChangesAsync();
                 existingSkills.AddRange(newSkills);
             }
-
+            
             module.Title = dto.Title;
             module.Description = dto.Description;
-            module.Skills = existingSkills;
             module.TestId = dto.TestId;
             module.StatusId = 1; // Draft
+            
+            module.Skills.Clear();
+            foreach (var skill in existingSkills)
+            {
+                module.Skills.Add(skill);
+            }
 
             await _db.SaveChangesAsync();
             return _mapper.Map<ModuleDto>(module);
