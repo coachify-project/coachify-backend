@@ -1,9 +1,12 @@
-﻿namespace Coachify.BLL.DTOs.CoachApplication
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Coachify.BLL.DTOs.CoachApplication
 {
     public class UpdateCoachApplicationDto
     {
-        public string? Bio { get; set; }
-        public int? StatusId { get; set; }
-        public string? Specialization { get; set; }
+        [MaxLength(1000)] public string? Bio { get; set; }
+
+        [MaxLength(255)] public string? Specialization { get; set; }
+        [Range(1, 3)] public int? StatusId { get; set; }
     }
 }

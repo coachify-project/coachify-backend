@@ -1,4 +1,6 @@
-﻿namespace Coachify.BLL.DTOs.CoachApplication
+﻿using Coachify.DAL.Entities;
+
+namespace Coachify.BLL.DTOs.CoachApplication
 {
     public class CoachApplicationDto
     {
@@ -6,7 +8,8 @@
         public int UserId { get; set; }
         public string Bio { get; set; }
         public string Specialization { get; set; }
+        public string? AvatarUrl { get; set; }
         public DateTime CreatedAt { get; set; }
-        public int StatusId { get; set; }
+        public string StatusName { get; set; } = null!;
     }
 }

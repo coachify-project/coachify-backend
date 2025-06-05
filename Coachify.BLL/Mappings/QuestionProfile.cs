@@ -12,6 +12,8 @@ namespace Coachify.BLL.Mappings
                 .ForMember(dest => dest.Options, opt => opt.MapFrom(src => src.Options));
             CreateMap<CreateQuestionDto, Question>().ReverseMap();
             CreateMap<Question, UpdateQuestionDto>().ReverseMap();
+            CreateMap<CreateQuestionWithOptionsDto, Question>();
+
         }
     }
 }

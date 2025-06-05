@@ -8,9 +8,10 @@ namespace Coachify.BLL.Mappings
     {
         public TestSubmissionAnswerProfile()
         {
-            CreateMap<TestSubmissionAnswer, TestSubmissionAnswerDto>().ReverseMap();
-            CreateMap<TestSubmissionAnswer, CreateTestSubmissionAnswerDto>().ReverseMap();
-            CreateMap<TestSubmissionAnswer, UpdateTestSubmissionAnswerDto>().ReverseMap();
+            CreateMap<TestSubmissionAnswer, TestSubmissionAnswerDto>();
+            CreateMap<CreateTestSubmissionAnswerDto, TestSubmissionAnswer>();
+            CreateMap<UpdateTestSubmissionAnswerDto, TestSubmissionAnswer>();
+
         }
     }
 }

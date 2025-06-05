@@ -1,40 +1,42 @@
-﻿using Coachify.BLL.DTOs.TestSubmissionAnswer;
+﻿using Microsoft.AspNetCore.Mvc;
 using Coachify.BLL.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using Coachify.BLL.DTOs.TestSubmissionAnswer;
 
 namespace Coachify.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TestSubmissionAnswersController : ControllerBase
+public class TestSubmissionAnswerController : ControllerBase
 {
     private readonly ITestSubmissionAnswerService _service;
-    public TestSubmissionAnswersController(ITestSubmissionAnswerService service) => _service = service;
 
+    public TestSubmissionAnswerController(ITestSubmissionAnswerService service)
+    {
+        _service = service;
+    }
+
+    
     [HttpGet]
-    public async Task<IActionResult> GetAll() => Ok(await _service.GetAllAsync());
-
+    public async Task<IActionResult> GetAll()
+    {
+        var answers = await _service.GetAllAsync();
+        return Ok(answers);
+    }
+    
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var d = await _service.GetByIdAsync(id);
-        return d == null ? NotFound() : Ok(d);
-    }
+        var answer = await _service.GetByIdAsync(id);
+        if (answer == null)
+            return NotFound();
 
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateTestSubmissionAnswerDto dto)
-    {
-        var c = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = c.Id }, c);
+        return Ok(answer);
     }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateTestSubmissionAnswerDto dto)
-    {
-        await _service.UpdateAsync(id, dto);
-        return NoContent();
-    }
-
+    
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id) => Ok(await _service.DeleteAsync(id));
+    public async Task<IActionResult> Delete(int id)
+    {
+        var success = await _service.DeleteAsync(id);
+        return success ? Ok() : NotFound();
+    }
 }

@@ -18,37 +18,69 @@ public class AnswerOptionService : IAnswerOptionService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<AnswerOptionDto>> GetAllAsync() =>
-        _mapper.Map<IEnumerable<AnswerOptionDto>>(await _db.AnswerOptions.ToListAsync());
+    public async Task<IEnumerable<AnswerOptionDto>> GetAllAsync()
+    {
+        var options = await _db.AnswerOptions.ToListAsync();
+        return _mapper.Map<IEnumerable<AnswerOptionDto>>(options);
+    }
+
+    public async Task<IEnumerable<AnswerOptionDto>> GetByQuestionIdAsync(int questionId)
+    {
+        var options = await _db.AnswerOptions
+            .Where(o => o.QuestionId == questionId)
+            .ToListAsync();
+
+        return _mapper.Map<IEnumerable<AnswerOptionDto>>(options);
+    }
 
     public async Task<AnswerOptionDto?> GetByIdAsync(int id)
     {
-        var e = await _db.AnswerOptions.FindAsync(id);
-        return e == null ? null : _mapper.Map<AnswerOptionDto>(e);
+        var option = await _db.AnswerOptions.FindAsync(id);
+        if (option == null) return null;
+        return _mapper.Map<AnswerOptionDto>(option);
     }
 
     public async Task<AnswerOptionDto> CreateAsync(CreateAnswerOptionDto dto)
     {
-        var e = _mapper.Map<AnswerOption>(dto);
-        _db.AnswerOptions.Add(e);
+        // Проверяем, что вопрос существует
+        var questionExists = await _db.Questions.AnyAsync(q => q.QuestionId == dto.QuestionId);
+        if (!questionExists)
+            throw new ArgumentException($"Question with id {dto.QuestionId} not found");
+
+        var option = _mapper.Map<AnswerOption>(dto);
+        _db.AnswerOptions.Add(option);
         await _db.SaveChangesAsync();
-        return _mapper.Map<AnswerOptionDto>(e);
+
+        return _mapper.Map<AnswerOptionDto>(option);
     }
 
-    public async Task UpdateAsync(int id, UpdateAnswerOptionDto dto)
+    public async Task<AnswerOptionDto?> UpdateAsync(int id, UpdateAnswerOptionDto dto)
     {
-        var e = await _db.AnswerOptions.FindAsync(id);
-        if (e == null) return;
-        _mapper.Map(dto, e);
+        var option = await _db.AnswerOptions.FindAsync(id);
+        if (option == null) return null;
+
+        // Проверяем, если пытаемся сменить QuestionId, что новый вопрос существует
+        if (dto.QuestionId != option.QuestionId)
+        {
+            var questionExists = await _db.Questions.AnyAsync(q => q.QuestionId == dto.QuestionId);
+            if (!questionExists)
+                throw new ArgumentException($"Question with id {dto.QuestionId} not found");
+        }
+
+        _mapper.Map(dto, option);
         await _db.SaveChangesAsync();
+
+        return _mapper.Map<AnswerOptionDto>(option);
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var e = await _db.AnswerOptions.FindAsync(id);
-        if (e == null) return false;
-        _db.AnswerOptions.Remove(e);
+        var option = await _db.AnswerOptions.FindAsync(id);
+        if (option == null) return false;
+
+        _db.AnswerOptions.Remove(option);
         await _db.SaveChangesAsync();
+
         return true;
     }
 }

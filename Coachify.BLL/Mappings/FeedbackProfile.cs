@@ -8,9 +8,12 @@ namespace Coachify.BLL.Mappings
     {
         public FeedbackProfile()
         {
-            CreateMap<Feedback, FeedbackDto>().ReverseMap();
-            CreateMap<Feedback, CreateFeedbackDto>().ReverseMap();
+            CreateMap<Feedback, FeedbackDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.FeedbackId));
+            CreateMap<CreateFeedbackDto, Feedback>()
+                .ForMember(dest => dest.FeedbackId, opt => opt.Ignore());
             CreateMap<Feedback, UpdateFeedbackDto>().ReverseMap();
         }
     }
 }
+

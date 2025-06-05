@@ -13,7 +13,7 @@ public class Feedback
     public Course Course { get; set; } = null!;
     
     [ForeignKey(nameof(Client))]
-    public int ClientId { get; set; }
+    public int UserId { get; set; }
     public User Client { get; set; } = null!;
 
     [Required]

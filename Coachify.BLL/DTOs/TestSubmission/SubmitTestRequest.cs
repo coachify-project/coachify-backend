@@ -1,7 +1,11 @@
-﻿namespace Coachify.BLL.DTOs.TestSubmission;
+﻿using Coachify.BLL.DTOs.TestSubmissionAnswer;
 
-public class SubmitTestRequest
+namespace Coachify.BLL.DTOs.TestSubmission;
+
+public class SubmitTestRequestDto
 {
-    public List<SubmitAnswerDto> Answers { get; set; }
-
+    public int TestId { get; set; }
+    public int UserId { get; set; }
+    public List<SubmitAnswerDto> Answers { get; set; } = new();
 }
+

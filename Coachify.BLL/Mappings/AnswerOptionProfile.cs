@@ -10,7 +10,8 @@ namespace Coachify.BLL.Mappings
         {
             CreateMap<AnswerOption, AnswerOptionDto>();
             CreateMap<CreateAnswerOptionDto, AnswerOption>().ReverseMap();
-            CreateMap<AnswerOption, UpdateAnswerOptionDto>().ReverseMap();
+            CreateMap<UpdateAnswerOptionDto, AnswerOption>().ReverseMap();
+
         }
     }
 }

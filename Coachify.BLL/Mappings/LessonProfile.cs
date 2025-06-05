@@ -9,9 +9,18 @@ namespace Coachify.BLL.Mappings
         public LessonProfile()
         {
             CreateMap<Lesson, LessonDto>()
-                .ForMember(dest => dest.LessonId, opt => opt.MapFrom(src => src.LessonId));
+                .ForMember(dest => dest.Status, opt =>
+                    opt.MapFrom(src =>
+                        src.UserProgresses.FirstOrDefault() != null
+                            ? src.UserProgresses.First().Status
+                            : null
+                    ));
+
+            // Map CreateLessonDto to Lesson
             CreateMap<CreateLessonDto, Lesson>()
                 .ForMember(dest => dest.LessonId, opt => opt.Ignore());
+
+            // Map UpdateLessonDto to Lesson
             CreateMap<UpdateLessonDto, Lesson>();
         }
     }

@@ -34,7 +34,7 @@ namespace Coachify.BLL.Services
                 LastName = dto.LastName,
                 PasswordSalt = hmac.Key,
                 PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password)),
-                RoleId = 2 // например, обычный пользователь
+                RoleId = 2 
             };
 
             _context.Users.Add(user);

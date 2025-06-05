@@ -32,7 +32,8 @@ public class QuestionsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, UpdateQuestionDto dto)
     {
-        await _service.UpdateAsync(id, dto);
+        var updated = await _service.UpdateAsync(id, dto);
+        if (updated == null) return NotFound();
         return NoContent();
     }
 

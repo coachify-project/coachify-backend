@@ -1,79 +1,133 @@
-﻿using Coachify.BLL.DTOs.Lesson;
-using Coachify.BLL.Interfaces;
+﻿// LessonsController.cs (исправленная версия)
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Coachify.BLL.Interfaces;
+using Coachify.BLL.DTOs;
+using Coachify.BLL.DTOs.Lesson;
 
-namespace Coachify.API.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class LessonsController : ControllerBase
+namespace Coachify.API.Controllers
 {
-    private readonly ILessonService _service;
-    public LessonsController(ILessonService service) => _service = service;
-
-    [HttpGet]
-    public async Task<IActionResult> GetAll() => Ok(await _service.GetAllAsync());
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> Get(int id)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class LessonsController : ControllerBase
     {
-        var d = await _service.GetByIdAsync(id);
-        return d == null ? NotFound() : Ok(d);
-    }
+        private readonly ILessonService _service;
 
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateLessonDto dto)
-    {
-        var createdLesson = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = createdLesson.LessonId }, createdLesson);
-    }
+        public LessonsController(ILessonService service)
+        {
+            _service = service;
+        }
 
+        // GET: api/lessons
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<LessonDto>>> GetAll()
+        {
+            var lessons = await _service.GetAllAsync();
+            return Ok(lessons);
+        }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateLessonDto dto)
-    {
-        await _service.UpdateAsync(id, dto);
-        return NoContent();
-    }
-    
-    // LessonsController.cs
-    [HttpPost("start/{userId}/{lessonId}")]
-    public async Task<ActionResult> StartLesson(int userId, int lessonId)
-    {
-        try
+        // GET: api/lessons/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<LessonDto>> Get(int id)
         {
-            var result = await _service.StartLessonAsync(userId, lessonId);
-            return Ok(new { success = result });
+            var lesson = await _service.GetByIdAsync(id);
+            if (lesson == null)
+                return NotFound();
+            return Ok(lesson);
         }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "Произошла ошибка при начале прохождения урока");
-        }
-    }
 
-    [HttpPost("complete/{userId}/{lessonId}")]
-    public async Task<ActionResult> CompleteLesson(int userId, int lessonId)
-    {
-        try
+        // GET: api/lessons/module/5
+        [HttpGet("module/{moduleId}")]
+        public async Task<ActionResult<IEnumerable<LessonDto>>> GetByModule(int moduleId)
         {
-            var result = await _service.CompleteLessonAsync(userId, lessonId);
-            return Ok(new { success = result });
+            try
+            {
+                var lessons = await _service.GetByModuleAsync(moduleId);
+                return Ok(lessons);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
-        catch (ArgumentException ex)
+
+        // GET: api/lessons/module/5/user/10
+        [HttpGet("module/{moduleId}/user/{userId}")]
+        public async Task<ActionResult<IEnumerable<LessonDto>>> GetByModuleForUser(int moduleId, int userId)
         {
-            return BadRequest(ex.Message);
+            try
+            {
+                var lessons = await _service.GetByModuleForUserAsync(moduleId, userId);
+                return Ok(lessons);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
-        catch (Exception)
+
+        // POST: api/lessons
+        [HttpPost]
+        public async Task<ActionResult<LessonDto>> Create([FromBody] CreateLessonDto dto)
         {
-            return StatusCode(500, "Произошла ошибка при завершении урока");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var createdLesson = await _service.CreateAsync(dto);
+                return CreatedAtAction(nameof(Get), new { id = createdLesson.LessonId }, createdLesson);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // PUT: api/lessons/5
+        [HttpPut("{id}")]
+        public async Task<ActionResult<LessonDto>> Update(int id, [FromBody] UpdateLessonDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var updatedLesson = await _service.UpdateAsync(id, dto);
+                return Ok(updatedLesson);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // DELETE: api/lessons/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            try
+            {
+                var deleted = await _service.DeleteAsync(id);
+                if (!deleted)
+                    return NotFound();
+
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id) => Ok(await _service.DeleteAsync(id));
 }
-

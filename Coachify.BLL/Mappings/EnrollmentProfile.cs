@@ -10,8 +10,8 @@ namespace Coachify.BLL.Mappings
         {
             CreateMap<Enrollment, EnrollmentDto>()
                 .ForMember(dest => dest.EnrollmentId, opt => opt.MapFrom(src => src.EnrollmentId));
-            CreateMap<CreateEnrollmentDto, Enrollment>().ReverseMap();
-            CreateMap<Enrollment, UpdateEnrollmentDto>().ReverseMap();
+            CreateMap<CreateEnrollmentDto, Enrollment>();
+            CreateMap<Enrollment, UpdateEnrollmentDto>();
             CreateMap<EnrollmentStatus, EnrollmentStatusDto>();
 
         }

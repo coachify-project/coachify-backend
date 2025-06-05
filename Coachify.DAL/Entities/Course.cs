@@ -22,6 +22,8 @@ public class Course
     public int CategoryId { get; set; }
     public Category Category { get; set; } = null!;
     
+    public DateTime SubmittedAt { get; set; }
+    
     public int StatusId { get; set; }
     public CourseStatus Status { get; set; } = null!; // Draft, PendingApproval, Published, Blocked
     

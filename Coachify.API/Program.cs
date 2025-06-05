@@ -18,7 +18,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options
       .UseSqlite(
           builder.Configuration.GetConnectionString("DefaultConnection")
-          ?? "Data Source=coachify.db"
       )
       .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
 );
@@ -78,9 +77,7 @@ builder.Services.AddScoped<IEnrollmentStatusService, EnrollmentStatusService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IFeedbackStatusService, FeedbackStatusService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
-builder.Services.AddScoped<ILessonStatusService, LessonStatusService>();
 builder.Services.AddScoped<IModuleService, ModuleService>();
-builder.Services.AddScoped<IModuleStatusService, ModuleStatusService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentStatusService, PaymentStatusService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
@@ -90,13 +87,14 @@ builder.Services.AddScoped<ITestService, TestService>();
 builder.Services.AddScoped<ITestSubmissionService, TestSubmissionService>();
 builder.Services.AddScoped<ITestSubmissionAnswerService, TestSubmissionAnswerService>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
-builder.Services.AddScoped<IUserCoachApplicationStatusService, UserCoachApplicationStatusService>();
+builder.Services.AddScoped<IProgressService, ProgressService>();
+
 
 
 // ==== 6. Add Controllers, CORS & Swagger ====
 builder.Services.AddControllers();
 
-var allowedOrigins = new[] { "http://localhost:5173" }; // замени, если нужно
+var allowedOrigins = new[] { "http://localhost:5173" };
 
 builder.Services.AddCors(options =>
 {
@@ -104,7 +102,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials()  // если axios с withCredentials: true
+              .AllowCredentials()  
     );
 });
 

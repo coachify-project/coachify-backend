@@ -17,9 +17,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Feedback> Feedbacks { get; set; }
     public DbSet<FeedbackStatus> FeedbackStatuses { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
-    public DbSet<LessonStatus> LessonStatuses { get; set; }
     public DbSet<Module> Modules { get; set; }
-    public DbSet<ModuleStatus> ModuleStatuses { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<PaymentStatus> PaymentStatuses { get; set; }
     public DbSet<Question> Questions { get; set; }
@@ -30,6 +28,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<TestSubmissionAnswer> TestSubmissionAnswers { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserCoachApplicationStatus> UserCoachApplicationStatuses { get; set; }
+    public DbSet<UserLessonProgress> UserLessonProgresses { get; set; }
+    public DbSet<UserModuleProgress> UserModuleProgresses { get; set; }
+    public DbSet<ProgressStatus> ProgressStatuses { get; set; }
+
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -37,7 +39,7 @@ public class ApplicationDbContext : DbContext
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlite("Data Source=coachify.db");
+        => optionsBuilder.UseSqlite("Data Source=..\\Coachify.DAL\\coachify.db");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -83,20 +85,12 @@ public class ApplicationDbContext : DbContext
             .WithMany(s => s.Modules)
             .UsingEntity(j => j.ToTable("ModuleSkill"));
 
-        modelBuilder.Entity<Lesson>()
-            .HasOne(l => l.Status)
-            .WithMany()
-            .HasForeignKey(l => l.StatusId);
-        
-
-
-
         modelBuilder.Entity<Test>()
             .HasOne(t => t.Module)
             .WithOne(m => m.Test)
             .HasForeignKey<Test>(t => t.ModuleId);
 
-        // Relationships between Enrollment and User, Course, Payment, Certificate
+        // Enrollment relationships
         modelBuilder.Entity<Enrollment>()
             .HasOne(e => e.User)
             .WithMany(u => u.Enrollments)
@@ -119,7 +113,7 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey<Certificate>(c => c.EnrollmentId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        // Relationships between Feedback, Course, and Client
+        // Feedback relationships
         modelBuilder.Entity<Feedback>()
             .HasOne(f => f.Course)
             .WithMany(c => c.Feedbacks)
@@ -128,9 +122,19 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Feedback>()
             .HasOne(f => f.Client)
             .WithMany(u => u.Feedbacks)
-            .HasForeignKey(f => f.ClientId);
+            .HasForeignKey(f => f.UserId);
 
-        // Relationships between TestSubmission, Test, and User (Client)
+        // Progress unique indices
+        modelBuilder.Entity<UserLessonProgress>()
+            .HasIndex(p => new { p.UserId, p.LessonId })
+            .IsUnique();
+        
+        modelBuilder.Entity<UserModuleProgress>()
+            .HasIndex(p => new { p.UserId, p.ModuleId })
+            .IsUnique();
+
+
+        // TestSubmission relationships
         modelBuilder.Entity<TestSubmission>()
             .HasOne(ts => ts.Test)
             .WithMany(t => t.Submissions)
@@ -141,7 +145,7 @@ public class ApplicationDbContext : DbContext
             .WithMany(u => u.TestSubmissions)
             .HasForeignKey(ts => ts.UserId);
 
-        // Relationships between TestSubmissionAnswer, TestSubmission, Option, and Question
+        // TestSubmissionAnswer relationships
         modelBuilder.Entity<TestSubmissionAnswer>()
             .HasOne(tsa => tsa.Submission)
             .WithMany(ts => ts.Answers)
@@ -157,7 +161,7 @@ public class ApplicationDbContext : DbContext
             .WithMany(q => q.TestSubmissionAnswers)
             .HasForeignKey(tsa => tsa.QuestionId);
 
-        // Cascade delete configuration for related entities
+        // Seed data
         modelBuilder.Entity<CourseStatus>().HasData(
             new CourseStatus { StatusId = 1, Name = "Draft" },
             new CourseStatus { StatusId = 2, Name = "Pending" },
@@ -171,20 +175,11 @@ public class ApplicationDbContext : DbContext
             new EnrollmentStatus { StatusId = 3, Name = "Completed" }
         );
 
-
-        modelBuilder.Entity<LessonStatus>().HasData(
-            new LessonStatus { StatusId = 1, StatusName = "Draft" },
-            new LessonStatus { StatusId = 2, StatusName = "Not Started" },
-            new LessonStatus { StatusId = 3, StatusName = "In Progress" },
-            new LessonStatus { StatusId = 4, StatusName = "Completed" }
-        );
-
-
-        modelBuilder.Entity<ModuleStatus>().HasData(
-            new ModuleStatus { StatusId = 1, StatusName = "Draft" },
-            new ModuleStatus { StatusId = 2, StatusName = "Not Started" },
-            new ModuleStatus { StatusId = 3, StatusName = "In progress" },
-            new ModuleStatus { StatusId = 4, StatusName = "Completed" }
+        modelBuilder.Entity<ProgressStatus>().HasData(
+            new ProgressStatus { StatusId = 1, Name = "Draft" },
+            new ProgressStatus { StatusId = 2, Name = "Not Started" },
+            new ProgressStatus { StatusId = 3, Name = "In Progress" },
+            new ProgressStatus { StatusId = 4, Name = "Completed" }
         );
 
 
