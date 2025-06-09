@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Coachify.BLL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fc55031e271886e3cd9a05b987c6535a5b172acc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+47f06b0683a34e1591da5979762fb96d650efc5a")]
 [assembly: System.Reflection.AssemblyProductAttribute("Coachify.BLL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Coachify.BLL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

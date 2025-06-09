@@ -7,6 +7,7 @@ public class TestDto
     public int Id { get; set; }
     public string Title { get; set; }
     public int ModuleId { get; set; }
+    public int PassScore { get; set; }
     
     public List<QuestionDto> Questions { get; set; } = new();
 }

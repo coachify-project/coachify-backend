@@ -184,18 +184,104 @@ public class CourseService : ICourseService
         return _mapper.Map<CourseDto>(course);
     }
 
-    public async Task<bool> DeleteAsync(int id)
+  public async Task<bool> DeleteAsync(int id)
+{
+    using var transaction = await _db.Database.BeginTransactionAsync();
+    try
     {
-        var course = await _db.Courses.FindAsync(id);
+        var course = await _db.Courses
+            .Include(c => c.Modules)
+                .ThenInclude(m => m.Lessons)
+            .Include(c => c.Modules)
+                .ThenInclude(m => m.Test)
+                    .ThenInclude(t => t.Questions)
+                        .ThenInclude(q => q.Options)
+            .FirstOrDefaultAsync(c => c.CourseId == id);
+
         if (course == null) return false;
 
         if (course.StatusId != 1 && course.StatusId != 4) // Draft or Rejected only
             throw new InvalidOperationException("Only draft or rejected courses can be deleted.");
 
+        // Удаляем все связанные данные прогресса пользователей
+        var moduleIds = course.Modules.Select(m => m.ModuleId).ToList();
+        var lessonIds = course.Modules.SelectMany(m => m.Lessons).Select(l => l.LessonId).ToList();
+        var testIds = course.Modules.Where(m => m.Test != null).Select(m => m.Test.TestId).ToList();
+
+        // Удаляем прогресс пользователей по урокам
+        var userLessonProgresses = await _db.UserLessonProgresses
+            .Where(ulp => lessonIds.Contains(ulp.LessonId))
+            .ToListAsync();
+        _db.UserLessonProgresses.RemoveRange(userLessonProgresses);
+
+        // Удаляем прогресс пользователей по модулям
+        var userModuleProgresses = await _db.UserModuleProgresses
+            .Where(ump => moduleIds.Contains(ump.ModuleId))
+            .ToListAsync();
+        _db.UserModuleProgresses.RemoveRange(userModuleProgresses);
+
+        // Удаляем результаты тестов
+        var testSubmissions = await _db.TestSubmissions
+            .Where(ts => testIds.Contains(ts.TestId))
+            .ToListAsync();
+        _db.TestSubmissions.RemoveRange(testSubmissions);
+
+        // Удаляем записи на курс
+        var enrollments = await _db.Enrollments
+            .Where(e => e.CourseId == id)
+            .ToListAsync();
+        _db.Enrollments.RemoveRange(enrollments);
+
+        // Удаляем отзывы о курсе
+        var feedbacks = await _db.Feedbacks
+            .Where(f => f.CourseId == id)
+            .ToListAsync();
+        _db.Feedbacks.RemoveRange(feedbacks);
+
+        // Удаляем варианты ответов
+        var answerOptions = course.Modules
+            .Where(m => m.Test != null)
+            .SelectMany(m => m.Test.Questions)
+            .SelectMany(q => q.Options)
+            .ToList();
+        _db.AnswerOptions.RemoveRange(answerOptions);
+
+        // Удаляем вопросы
+        var questions = course.Modules
+            .Where(m => m.Test != null)
+            .SelectMany(m => m.Test.Questions)
+            .ToList();
+        _db.Questions.RemoveRange(questions);
+
+        // Удаляем тесты
+        var tests = course.Modules
+            .Where(m => m.Test != null)
+            .Select(m => m.Test)
+            .ToList();
+        _db.Tests.RemoveRange(tests);
+
+        // Удаляем уроки
+        var lessons = course.Modules
+            .SelectMany(m => m.Lessons)
+            .ToList();
+        _db.Lessons.RemoveRange(lessons);
+
+        // Удаляем модули
+        _db.Modules.RemoveRange(course.Modules);
+
+        // Удаляем курс
         _db.Courses.Remove(course);
+
         await _db.SaveChangesAsync();
+        await transaction.CommitAsync();
         return true;
     }
+    catch
+    {
+        await transaction.RollbackAsync();
+        throw;
+    }
+}
 
     public async Task<bool> SubmitCourseAsync(int courseId, int coachId)
     {
