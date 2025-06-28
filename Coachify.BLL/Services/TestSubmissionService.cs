@@ -14,12 +14,13 @@ public class TestSubmissionService : ITestSubmissionService
     private readonly IProgressService _progressService;
 
     public TestSubmissionService(ApplicationDbContext db, IMapper mapper, IEnrollmentService enrollmentService,
-        IModuleService moduleService)
+        IModuleService moduleService,IProgressService progressService)
     {
         _db = db;
         _mapper = mapper;
         _enrollmentService = enrollmentService;
         _moduleService = moduleService;
+        _progressService = progressService;
     }
 
     public async Task<IEnumerable<TestSubmissionDto>> GetAllAsync()
@@ -83,21 +84,44 @@ public class TestSubmissionService : ITestSubmissionService
         return true;
     }
 
-    public async Task<TestSubmissionResultDto> CreateAsync(SubmitTestRequestDto dto)
+   public async Task<TestSubmissionResultDto> CreateAsync(SubmitTestRequestDto dto)
+{
+    try
     {
-        // 1. Загрузка всех вопросов и опций по тесту
+        Console.WriteLine($"Starting CreateAsync with TestId: {dto.TestId}, UserId: {dto.UserId}");
+        
+        // Проверки на null
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+        
+        if (dto.Answers == null)
+            throw new ArgumentNullException(nameof(dto.Answers));
+        
+        // 1. Загрузка теста с информацией о проходном балле
+        Console.WriteLine("Loading test and questions...");
+        var test = await _db.Tests
+            .Include(t => t.Module)
+            .FirstOrDefaultAsync(t => t.TestId == dto.TestId);
+            
+        if (test == null)
+            throw new KeyNotFoundException($"Test with ID {dto.TestId} not found");
+        
         var questions = await _db.Questions
             .Where(q => q.TestId == dto.TestId)
             .Include(q => q.Options)
             .ToListAsync();
 
+        Console.WriteLine($"Found {questions.Count} questions");
+        
         if (!questions.Any())
-            throw new KeyNotFoundException("Test or questions not found");
+            throw new KeyNotFoundException($"Test with ID {dto.TestId} has no questions");
 
         // 2. Словарь всех опций по ID
         var optionMap = questions.SelectMany(q => q.Options).ToDictionary(o => o.OptionId);
+        Console.WriteLine($"Created option map with {optionMap.Count} options");
 
         // 3. Создание сабмишена
+        Console.WriteLine("Creating submission...");
         var submission = new TestSubmission
         {
             TestId = dto.TestId,
@@ -107,99 +131,145 @@ public class TestSubmissionService : ITestSubmissionService
 
         _db.TestSubmissions.Add(submission);
         await _db.SaveChangesAsync();
+        Console.WriteLine($"Created submission with ID: {submission.SubmissionId}");
 
         int correctAnswers = 0;
+        var submissionAnswers = new List<TestSubmissionAnswer>();
 
         // 4. Обработка всех ответов пользователя
+        Console.WriteLine("Processing answers...");
         foreach (var answer in dto.Answers)
         {
+            Console.WriteLine($"Processing question {answer.QuestionId} with {answer.SelectedOptionIds.Count} options");
+            
+            if (answer.SelectedOptionIds == null)
+            {
+                Console.WriteLine($"SelectedOptionIds is null for question {answer.QuestionId}");
+                continue;
+            }
+            
             foreach (var optionId in answer.SelectedOptionIds.Distinct())
             {
                 if (optionMap.TryGetValue(optionId, out var option) &&
                     option.QuestionId == answer.QuestionId)
                 {
-                    if (option.IsCorrect) correctAnswers++;
+                    if (option.IsCorrect) 
+                    {
+                        correctAnswers++;
+                        Console.WriteLine($"Correct answer found: Option {optionId}");
+                    }
 
-                    _db.TestSubmissionAnswers.Add(new TestSubmissionAnswer
+                    submissionAnswers.Add(new TestSubmissionAnswer
                     {
                         SubmissionId = submission.SubmissionId,
                         QuestionId = answer.QuestionId,
                         OptionId = optionId
                     });
                 }
+                else
+                {
+                    Console.WriteLine($"Option {optionId} not found or doesn't belong to question {answer.QuestionId}");
+                }
             }
+        }
+
+        // Добавляем все ответы
+        if (submissionAnswers.Any())
+        {
+            _db.TestSubmissionAnswers.AddRange(submissionAnswers);
+            Console.WriteLine($"Adding {submissionAnswers.Count} submission answers");
         }
 
         int totalQuestions = questions.Count;
-
-        submission.Score = totalQuestions > 0
+        int scorePercentage = totalQuestions > 0
             ? (int)Math.Round(100.0 * correctAnswers / totalQuestions)
             : 0;
 
-        submission.IsPassed = submission.Score >= 30;
+        // Получаем проходной балл из теста (если есть) или используем дефолтный
+        int passingScore = test.PassScore ; // Дефолтный проходной балл 70%
+        
+        submission.Score = scorePercentage;
+        submission.IsPassed = scorePercentage >= passingScore;
+        
+        Console.WriteLine($"Score: {scorePercentage}%, Correct: {correctAnswers}/{totalQuestions}, Passed: {submission.IsPassed}, PassingScore: {passingScore}%");
+        
         await _db.SaveChangesAsync();
 
-        // 5. Проверка завершения курса
-        // Загружаем тест вместе с модулем
-        var test = await _db.Tests
-            .Include(t => t.Module)
-            .FirstOrDefaultAsync(t => t.TestId == submission.TestId);
-
-        if (test == null || test.Module == null)
-            throw new InvalidOperationException("Test or module not found");
-
-// Теперь можем безопасно получить CourseId
-        var courseId = test.Module.CourseId;
-
-        var enrollment = await _db.Enrollments
-            .Include(e => e.Course)
-            .ThenInclude(c => c.Modules)
-            .ThenInclude(m => m.Test)
-            .FirstOrDefaultAsync(e =>
-                e.CourseId == courseId &&
-                e.UserId == dto.UserId);
-
-
-        if (enrollment != null && submission.IsPassed)
+        // 5. Проверка завершения курса и модуля
+        Console.WriteLine("Checking course/module completion...");
+        if (test?.Module != null)
         {
-            bool allPassed = enrollment.Course.Modules.All(m =>
-                m.Test == null ||
-                _db.TestSubmissions.Any(ts =>
-                    ts.TestId == m.Test.TestId &&
-                    ts.UserId == dto.UserId &&
-                    ts.IsPassed));
+            Console.WriteLine($"Test found, ModuleId: {test.ModuleId}");
+            var courseId = test.Module.CourseId;
 
-            if (allPassed && enrollment.StatusId != 3)
+            // Логика завершения курса
+            var enrollment = await _db.Enrollments
+                .Include(e => e.Course)
+                .ThenInclude(c => c.Modules)
+                .ThenInclude(m => m.Test)
+                .FirstOrDefaultAsync(e =>
+                    e.CourseId == courseId &&
+                    e.UserId == dto.UserId);
+
+            if (enrollment != null && submission.IsPassed)
             {
-                await _enrollmentService.CompleteEnrollmentAsync(enrollment.EnrollmentId);
+                Console.WriteLine("Checking if all course tests are passed...");
+                bool allPassed = enrollment.Course.Modules.All(m =>
+                    m.Test == null ||
+                    _db.TestSubmissions.Any(ts =>
+                        ts.TestId == m.Test.TestId &&
+                        ts.UserId == dto.UserId &&
+                        ts.IsPassed));
+
+                if (allPassed && enrollment.StatusId != 3)
+                {
+                    Console.WriteLine("Completing enrollment...");
+                    if (_enrollmentService != null)
+                        await _enrollmentService.CompleteEnrollmentAsync(enrollment.EnrollmentId);
+                }
+            }
+
+            // Завершение модуля
+            if (submission.IsPassed)
+            {
+                Console.WriteLine("Checking module completion...");
+                bool allModuleTestsPassed = await _db.TestSubmissions
+                    .Where(ts => ts.UserId == dto.UserId && ts.Test.ModuleId == test.ModuleId)
+                    .AllAsync(ts => ts.IsPassed);
+
+                if (allModuleTestsPassed)
+                {
+                    Console.WriteLine("Completing module...");
+                    if (_progressService != null)
+                        await _progressService.CompleteModuleAsync(dto.UserId, test.ModuleId);
+                }
             }
         }
-
-        // --- Новый код: завершение модуля ---
-
-        // Получаем модуль по тесту
-        var module = await _db.Modules
-            .FirstOrDefaultAsync(m => m.ModuleId == submission.Test.ModuleId);
-
-        if (module != null)
+        else
         {
-            // Проверяем, все ли тесты модуля пройдены пользователем
-            bool allModuleTestsPassed = await _db.TestSubmissions
-                .Where(ts => ts.UserId == dto.UserId && ts.Test.ModuleId == module.ModuleId)
-                .AllAsync(ts => ts.IsPassed);
-
-            if (allModuleTestsPassed)
-            {
-                // Вызываем метод завершения модуля
-                await _progressService.CompleteModuleAsync(dto.UserId, module.ModuleId);
-            }
+            Console.WriteLine("Test or Module not found");
         }
 
+        Console.WriteLine("CreateAsync completed successfully");
+        
+        // ИСПРАВЛЕННЫЙ ВОЗВРАТ ДАННЫХ - используем правильные имена полей
         return new TestSubmissionResultDto
         {
-            Score = submission.Score,
-            CorrectAnswers = correctAnswers,
-            TotalQuestions = totalQuestions
+            Score = scorePercentage, // Основной балл
+            scorePercentage = scorePercentage, // Для совместимости с фронтендом
+            correctAnswers = correctAnswers, // Lowercase для фронтенда
+            totalQuestions = totalQuestions, // Lowercase для фронтенда
+            passingScore = passingScore, // Проходной балл
+            passed = submission.IsPassed, // Статус прохождения
+            IsPassed = submission.IsPassed, // Для совместимости
+            SubmittedAt = submission.SubmittedAt
         };
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error in CreateAsync: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        throw;
+    }
+}
 }

@@ -6,6 +6,6 @@ public class SubmitTestRequestDto
 {
     public int TestId { get; set; }
     public int UserId { get; set; }
-    public List<SubmitAnswerDto> Answers { get; set; } = new();
+    public List<SubmitAnswerDto> Answers { get; set; } = new List<SubmitAnswerDto>();
 }
 
