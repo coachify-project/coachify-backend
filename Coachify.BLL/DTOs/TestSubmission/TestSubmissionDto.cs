@@ -11,9 +11,5 @@ public class TestSubmissionDto
     public int TotalQuestions { get; set; }
     public int CorrectAnswers { get; set; }
         
-    // Дополнительные поля для совместимости с фронтендом
-    public int scorePercentage => Score;
-    public int correctAnswers => CorrectAnswers;
-    public int totalQuestions => TotalQuestions;
-    public bool passed => IsPassed;
+    
 }
